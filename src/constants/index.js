@@ -1,1 +1,1 @@
-export { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from './theme';
+export { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants/theme';

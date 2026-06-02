@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { CustomInput, CustomButton } from '../../src/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '../../src/constants';
-import { resetPassword } from '../../src/services/authService';
-import { validatePassword } from '../../src/utils/validation';
+import { CustomInput, CustomButton } from '@/components/ui';
+import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { resetPassword } from '@/client/api/authService';
+import { validatePassword } from '@/utils/validation';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { COLORS } from '../../src/constants';
+import { COLORS } from '@/constants';
 
 /**
  * Auth stack layout — headerless screens for Login & Signup.

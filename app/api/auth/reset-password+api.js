@@ -1,6 +1,6 @@
-import connectToDatabase from '../../../src/utils/db';
-import User from '../../../src/models/User';
-import OTP from '../../../src/models/OTP';
+import connectToDatabase from '@/server/lib/db';
+import User from '@/server/models/User';
+import OTP from '@/server/models/OTP';
 
 export async function POST(request) {
   try {

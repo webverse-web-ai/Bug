@@ -108,7 +108,14 @@ export const resetPassword = async (email, otp, newPassword) => {
   return data;
 };
 
-export const socialLogin = async (provider) => {
-  // Social auth will be implemented in the next phase
-  throw new Error("Social auth not yet implemented");
+export const oauthLogin = async (provider, accessToken) => {
+  const response = await fetch(`${API_BASE_URL}/oauth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ provider, accessToken }),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to authenticate with ' + provider);
+  return data;
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, TYPOGRAPHY, ROUNDED, SPACING } from '../../constants';
+import { COLORS, TYPOGRAPHY, ROUNDED, SPACING } from '@/constants';
 
 /**
  * CustomInput component following the Cognitive Architecture design system.

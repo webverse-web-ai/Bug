@@ -8,7 +8,7 @@ import Animated, {
   withSpring,
   Easing
 } from 'react-native-reanimated';
-import { COLORS } from '../../constants';
+import { COLORS } from '@/constants';
 
 const NUM_DOTS = 12;
 const RADIUS = 70; // Distance of dots from center

@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator,
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAuth } from '../../src/contexts/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY, ROUNDED } from '../../src/constants/theme';
-import { CustomButton } from '../../src/components/ui';
+import { useAuth } from '@/contexts/AuthContext';
+import { COLORS, SPACING, TYPOGRAPHY, ROUNDED } from '@/constants/theme';
+import { CustomButton } from '@/components/ui';
 
 export default function VerifyScreen() {
   const { email, previewUrl } = useLocalSearchParams();

@@ -15,9 +15,17 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
       minlength: 6,
       select: false, // Don't return password by default
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google', 'facebook'],
+      default: 'local',
+    },
+    providerId: {
+      type: String,
+      default: null,
     },
     isVerified: {
       type: Boolean,

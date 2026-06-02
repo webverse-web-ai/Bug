@@ -1,7 +1,7 @@
-import connectToDatabase from '../../../src/utils/db';
-import User from '../../../src/models/User';
-import OTP from '../../../src/models/OTP';
-import { sendVerificationEmail } from '../../../src/utils/emailService';
+import connectToDatabase from '@/server/lib/db';
+import User from '@/server/models/User';
+import OTP from '@/server/models/OTP';
+import { sendVerificationEmail } from '@/server/lib/emailService';
 
 export async function POST(request) {
   try {

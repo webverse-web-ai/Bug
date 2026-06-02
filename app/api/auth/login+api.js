@@ -1,5 +1,5 @@
-import connectToDatabase from '../../../src/utils/db';
-import User from '../../../src/models/User';
+import connectToDatabase from '@/server/lib/db';
+import User from '@/server/models/User';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 

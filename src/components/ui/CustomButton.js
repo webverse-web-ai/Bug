@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
-import { COLORS, TYPOGRAPHY, ROUNDED, SPACING } from '../../constants';
+import { COLORS, TYPOGRAPHY, ROUNDED, SPACING } from '@/constants';
 
 /**
  * CustomButton component following the Cognitive Architecture design system.

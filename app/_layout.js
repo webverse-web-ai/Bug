@@ -11,8 +11,8 @@ import {
 } from '@expo-google-fonts/jetbrains-mono';
 import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { AnimatedSplashScreen } from '../src/components/ui';
-import { AuthProvider, useAuth } from '../src/contexts/AuthContext';
+import { AnimatedSplashScreen } from '@/components/ui';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
 

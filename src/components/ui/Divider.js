@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, TYPOGRAPHY, SPACING } from '../../constants';
+import { COLORS, TYPOGRAPHY, SPACING } from '@/constants';
 
 /**
  * Horizontal divider with centered text label (e.g. "OR").

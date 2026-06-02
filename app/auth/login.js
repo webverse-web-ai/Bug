@@ -16,10 +16,10 @@ import {
   CustomInput, 
   CustomButton, 
   SocialLoginButtons 
-} from '../../src/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '../../src/constants';
-import { useAuth } from '../../src/contexts/AuthContext';
-import { validateEmail, validatePassword } from '../../src/utils/validation';
+} from '@/components/ui';
+import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { useAuth } from '@/contexts/AuthContext';
+import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -124,10 +124,7 @@ export default function LoginScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            <SocialLoginButtons 
-              onGooglePress={() => {}}
-              onFacebookPress={() => {}}
-            />
+            <SocialLoginButtons />
           </View>
 
           <View style={styles.footer}>

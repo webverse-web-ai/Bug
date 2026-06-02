@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { CustomInput, CustomButton } from '../../src/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '../../src/constants';
-import { forgotPassword } from '../../src/services/authService';
-import { validateEmail } from '../../src/utils/validation';
+import { CustomInput, CustomButton } from '@/components/ui';
+import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { forgotPassword } from '@/client/api/authService';
+import { validateEmail } from '@/utils/validation';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();

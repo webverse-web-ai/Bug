@@ -15,10 +15,10 @@ import {
   CustomInput, 
   CustomButton, 
   SocialLoginButtons 
-} from '../../src/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '../../src/constants';
-import { signupUser } from '../../src/services/authService';
-import { validateEmail, validatePassword, validateRequired } from '../../src/utils/validation';
+} from '@/components/ui';
+import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { signupUser } from '@/client/api/authService';
+import { validateEmail, validatePassword, validateRequired } from '@/utils/validation';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -129,10 +129,7 @@ export default function SignupScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            <SocialLoginButtons 
-              onGooglePress={() => {}}
-              onFacebookPress={() => {}}
-            />
+            <SocialLoginButtons />
           </View>
 
           <View style={styles.footer}>

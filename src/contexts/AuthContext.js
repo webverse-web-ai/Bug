@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
-import { fetchCurrentUser, loginUser as apiLogin, verifyOTP as apiVerifyOTP } from '../services/authService';
+import { fetchCurrentUser, loginUser as apiLogin, verifyOTP as apiVerifyOTP, oauthLogin as apiOauthLogin } from '@/client/api/authService';
 
 const AuthContext = createContext({});
 
@@ -54,6 +54,15 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const oauthLogin = async (provider, accessToken) => {
+    const data = await apiOauthLogin(provider, accessToken);
+    if (data.token) {
+      await saveToken(data.token);
+      setUser(data.user);
+    }
+    return data;
+  };
+
   const verifyOTP = async (email, otp) => {
     const data = await apiVerifyOTP(email, otp);
     if (data.token) {
@@ -73,7 +82,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, verifyOTP }}>
+    <AuthContext.Provider value={{ user, loading, login, oauthLogin, logout, verifyOTP }}>
       {children}
     </AuthContext.Provider>
   );
