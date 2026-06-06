@@ -30,9 +30,14 @@ function RootLayoutNav({ appReady, setAppReady }) {
     if (!user && !inAuthGroup) {
       // Redirect to the login page
       router.replace('/auth/login');
-    } else if (user && inAuthGroup) {
-      // Redirect away from the auth pages
-      router.replace('/');
+    } else if (user) {
+      const hasCompletedSetup = !!user.username;
+      
+      if (!hasCompletedSetup && segments[0] !== 'setup') {
+        router.replace('/setup');
+      } else if (hasCompletedSetup && (inAuthGroup || segments[0] === 'setup')) {
+        router.replace('/(dashboard)');
+      }
     }
   }, [user, loading, segments, appReady]);
 

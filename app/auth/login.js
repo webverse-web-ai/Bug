@@ -51,7 +51,7 @@ export default function LoginScreen() {
       await login(email, password);
       // login success will trigger AuthContext state update
       // Router redirection is usually handled in _layout.js, or we can force it:
-      router.replace('/');
+      router.replace('/setup');
     } catch (error) {
       setErrorMessage(error.message || 'Login failed');
     } finally {

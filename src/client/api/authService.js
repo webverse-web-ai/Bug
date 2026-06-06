@@ -11,8 +11,8 @@ import { Platform } from 'react-native';
 const getApiUrl = () => {
   if (__DEV__ && Platform.OS !== 'web') {
     // Determine automatically or hardcode to your local network IP if needed
-    // Assuming standard Expo port 8081 for now. If using an emulator, 10.0.2.2 works for Android.
-    return Platform.OS === 'android' ? 'http://10.0.2.2:8081' : 'http://localhost:8081';
+    // The server is currently running on 8082
+    return Platform.OS === 'android' ? 'http://10.0.2.2:8082' : 'http://localhost:8082';
   }
   return ''; // For web, relative paths work
 };
@@ -117,5 +117,52 @@ export const oauthLogin = async (provider, accessToken) => {
   
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Failed to authenticate with ' + provider);
+  return data;
+};
+
+export const apiSaveGeminiToken = async (accessToken) => {
+  const response = await fetch(`${API_BASE_URL}/save-gemini-token`, {
+    method: 'POST',
+    headers: await getHeaders(),
+    body: JSON.stringify({ accessToken }),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to save Gemini token');
+  return data;
+};
+
+export const apiSaveOpenRouterKey = async (openRouterKey) => {
+  const response = await fetch(`${API_BASE_URL}/save-openrouter-key`, {
+    method: 'POST',
+    headers: await getHeaders(),
+    body: JSON.stringify({ openRouterKey }),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to save OpenRouter key');
+  return data;
+};
+
+export const apiCompleteSetup = async (username, path) => {
+  const response = await fetch(`${API_BASE_URL}/complete-setup`, {
+    method: 'POST',
+    headers: await getHeaders(),
+    body: JSON.stringify({ username, path }),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to complete setup');
+  return data;
+};
+
+export const apiCheckUsername = async (username) => {
+  const response = await fetch(`${API_BASE_URL}/check-username?username=${encodeURIComponent(username)}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to check username');
   return data;
 };

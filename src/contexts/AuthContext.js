@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
-import { fetchCurrentUser, loginUser as apiLogin, verifyOTP as apiVerifyOTP, oauthLogin as apiOauthLogin } from '@/client/api/authService';
+import { fetchCurrentUser, loginUser as apiLogin, verifyOTP as apiVerifyOTP, oauthLogin as apiOauthLogin, apiSaveGeminiToken, apiSaveOpenRouterKey, apiCompleteSetup } from '@/client/api/authService';
 
 const AuthContext = createContext({});
 
@@ -72,6 +72,22 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const saveGeminiToken = async (accessToken) => {
+    await apiSaveGeminiToken(accessToken);
+    setUser(prev => ({ ...prev, hasGeminiToken: true }));
+  };
+
+  const saveOpenRouterKey = async (key) => {
+    await apiSaveOpenRouterKey(key);
+    setUser(prev => ({ ...prev, hasOpenRouterKey: true }));
+  };
+
+  const completeSetup = async (username, path) => {
+    const data = await apiCompleteSetup(username, path);
+    setUser(prev => ({ ...prev, username: data.user.username }));
+    return data;
+  };
+
   const logout = async () => {
     if (Platform.OS === 'web') {
       localStorage.removeItem('jwt_token');
@@ -82,7 +98,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, oauthLogin, logout, verifyOTP }}>
+    <AuthContext.Provider value={{ user, loading, login, oauthLogin, logout, verifyOTP, saveGeminiToken, saveOpenRouterKey, completeSetup }}>
       {children}
     </AuthContext.Provider>
   );

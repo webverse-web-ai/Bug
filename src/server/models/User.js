@@ -3,6 +3,13 @@ import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      lowercase: true,
+    },
     fullName: {
       type: String,
       required: [true, 'Please provide a full name'],
@@ -24,6 +31,14 @@ const UserSchema = new mongoose.Schema(
       default: 'local',
     },
     providerId: {
+      type: String,
+      default: null,
+    },
+    geminiToken: {
+      type: String,
+      default: null,
+    },
+    openRouterKey: {
       type: String,
       default: null,
     },
