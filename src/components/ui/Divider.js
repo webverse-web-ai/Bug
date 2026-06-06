@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, TYPOGRAPHY, SPACING } from '@/constants';
+import { TYPOGRAPHY, SPACING } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * Horizontal divider with centered text label (e.g. "OR").
  */
 const Divider = ({ text = 'OR' }) => {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
   return (
     <View style={styles.container}>
       <View style={styles.line} />
@@ -15,7 +18,7 @@ const Divider = ({ text = 'OR' }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

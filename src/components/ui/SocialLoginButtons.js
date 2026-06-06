@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { COLORS, SPACING } from '@/constants';
+import { SPACING } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 import { CustomButton } from '@/components/ui/CustomButton';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
@@ -11,6 +12,8 @@ import { useRouter } from 'expo-router';
 WebBrowser.maybeCompleteAuthSession();
 
 export const SocialLoginButtons = () => {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
   const { oauthLogin } = useAuth();
   const router = useRouter();
   const [loadingProvider, setLoadingProvider] = useState(null);
@@ -70,7 +73,7 @@ export const SocialLoginButtons = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     gap: SPACING.sm, // 8px between buttons
     marginTop: SPACING.md,

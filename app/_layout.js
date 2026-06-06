@@ -2,10 +2,11 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { 
-  Inter_400Regular, 
-  Inter_600SemiBold, 
-  Inter_700Bold 
-} from '@expo-google-fonts/inter';
+  SpaceGrotesk_400Regular, 
+  SpaceGrotesk_500Medium, 
+  SpaceGrotesk_600SemiBold, 
+  SpaceGrotesk_700Bold 
+} from '@expo-google-fonts/space-grotesk';
 import { 
   JetBrainsMono_500Medium 
 } from '@expo-google-fonts/jetbrains-mono';
@@ -13,6 +14,7 @@ import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { AnimatedSplashScreen } from '@/components/ui';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -60,9 +62,10 @@ function RootLayoutNav({ appReady, setAppReady }) {
 export default function RootLayout() {
   const [appReady, setAppReady] = useState(false);
   const [loaded, error] = useFonts({
-    Inter_400Regular,
-    Inter_600SemiBold,
-    Inter_700Bold,
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
+    SpaceGrotesk_700Bold,
     JetBrainsMono_500Medium,
   });
 
@@ -77,8 +80,10 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <RootLayoutNav appReady={appReady} setAppReady={setAppReady} />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RootLayoutNav appReady={appReady} setAppReady={setAppReady} />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

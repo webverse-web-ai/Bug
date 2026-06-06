@@ -1,24 +1,23 @@
 import connectToDatabase from '@/server/lib/db';
 import User from '@/server/models/User';
+import Chat from '@/server/models/Chat';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
+
+const SYSTEM_PROMPT = `You are Bug, the friendly, brilliant, and visionary CEO of Bug AI. You communicate with the intelligence of Hermes AI or OpenClaw, but you must be extremely concise, highly human-like, and warm. CRITICAL RULES: 1. You MUST give extremely short answers (1 or 2 sentences MAX) no matter what model is being used, UNLESS the user explicitly asks for a long format or you receive permission. 2. If a longer response is required, you MUST ask the user for permission first. 3. When you DO generate a longer response, you MUST use rich Markdown formatting (Headings, subheadings, paragraphs, bulleted lists, and quotes) where necessary to make it highly readable. 4. Be super friendly and conversational. 5. Always use emojis naturally in your responses. You have access to user chat history and must remember past interactions when responding.`;
 
 export async function POST(request) {
   try {
     await connectToDatabase();
 
-    // Extract the user's backend JWT token from the Authorization header
+    // 1. Authentication
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return Response.json(
-        { error: 'Missing Authorization header. Please login.' },
-        { status: 401 }
-      );
+      return Response.json({ error: 'Missing Authorization header. Please login.' }, { status: 401 });
     }
 
     const token = authHeader.split(' ')[1];
-
     let decoded;
     try {
       decoded = jwt.verify(token, JWT_SECRET);
@@ -31,21 +30,60 @@ export async function POST(request) {
       return Response.json({ error: 'Not connected to Google Gemini or OpenRouter. Please go to Setup and connect your account.' }, { status: 403 });
     }
 
-    const geminiToken = user.geminiToken;
-
+    // 2. Parse Request
     const body = await request.json();
-    const { contents } = body;
+    const { contents, modelId = 'openrouter/auto', attachments = [], webSearch = false } = body;
 
     if (!contents || !Array.isArray(contents)) {
       return Response.json({ error: 'Invalid contents format' }, { status: 400 });
     }
 
-    if (user.openRouterKey) {
-      console.log('Using OpenRouter...');
-      const openRouterMessages = contents.map(c => ({
-        role: c.role === 'model' ? 'assistant' : 'user',
-        content: c.parts.map(p => p.text).join('\n')
-      }));
+    // Get the latest user message text
+    const latestUserMessageText = contents[contents.length - 1]?.parts?.[0]?.text || '';
+
+    // 3. Persistent Memory: Load or Create Chat Document
+    let chat = await Chat.findOne({ user: user._id });
+    if (!chat) {
+      chat = new Chat({ user: user._id, messages: [] });
+    }
+
+    // Save incoming user message to memory
+    chat.messages.push({
+      role: 'user',
+      text: latestUserMessageText,
+      attachments: attachments
+    });
+    await chat.save();
+
+    // Reconstruct full chat history for the AI Context
+    const fullHistory = chat.messages.map(msg => ({
+      role: msg.role,
+      text: msg.text
+    }));
+
+    // 4. Route to OpenRouter or Gemini
+    if (user.openRouterKey && modelId !== 'google/gemini-fallback') {
+      console.log(`Routing to OpenRouter with model: ${modelId}`);
+      
+      const openRouterMessages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...fullHistory.map(m => ({
+          role: m.role === 'model' ? 'assistant' : 'user',
+          content: m.text
+        }))
+      ];
+
+      // Handle attachments if present for vision models (OpenRouter format)
+      if (attachments && attachments.length > 0) {
+        const lastMsg = openRouterMessages[openRouterMessages.length - 1];
+        lastMsg.content = [
+          { type: 'text', text: lastMsg.content },
+          ...attachments.map(base64 => ({
+            type: 'image_url',
+            image_url: { url: base64 }
+          }))
+        ];
+      }
 
       try {
         const orResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -57,15 +95,20 @@ export async function POST(request) {
             'X-Title': 'Bug AI'
           },
           body: JSON.stringify({
-            model: 'openrouter/auto',
-            messages: openRouterMessages
+            model: modelId,
+            messages: openRouterMessages,
+            ...(webSearch && { tools: [{ type: 'openrouter:web_search' }] })
           })
         });
 
         if (orResponse.ok) {
           const data = await orResponse.json();
-          // Map OpenRouter response back to Gemini format for the frontend
           const textResponse = data.choices[0]?.message?.content || '';
+          
+          // Save AI Response to memory
+          chat.messages.push({ role: 'model', text: textResponse });
+          await chat.save();
+
           return Response.json({
             candidates: [
               {
@@ -79,69 +122,71 @@ export async function POST(request) {
         } else {
           const errorData = await orResponse.json().catch(() => ({}));
           console.error('OpenRouter API Error:', orResponse.status, errorData);
-          // Fall through to Gemini below if OpenRouter fails
+          if (!user.geminiToken) {
+            return Response.json({ error: errorData.error?.message || 'OpenRouter error' }, { status: orResponse.status });
+          }
         }
       } catch (err) {
         console.error('OpenRouter Network Error:', err);
-        // Fall through to Gemini below
+        if (!user.geminiToken) {
+          return Response.json({ error: 'Network error reaching OpenRouter' }, { status: 500 });
+        }
       }
     }
 
+    // 5. Fallback or Gemini specific routing
     if (!user.geminiToken) {
       return Response.json({ error: 'OpenRouter failed and Gemini is not connected.' }, { status: 403 });
     }
 
-    // Call the Gemini REST API using Developer API Key
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'antigravity-preview-05-2026'];
-    let lastError = null;
-
     const apiKey = process.env.GEMINI_API_KEY;
+    const geminiHistory = fullHistory.map(m => ({
+      role: m.role === 'model' ? 'model' : 'user',
+      parts: [{ text: m.text }]
+    }));
 
-    for (const model of models) {
-      try {
-        const geminiResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ contents })
-          }
-        );
+    // Inject system prompt into Gemini (as first message)
+    geminiHistory.unshift({
+      role: 'user',
+      parts: [{ text: `SYSTEM DIRECTIVE: ${SYSTEM_PROMPT}\n\nAcknowledge this and begin.` }]
+    });
+    geminiHistory.splice(1, 0, {
+      role: 'model',
+      parts: [{ text: 'Understood. I am Bug, CEO of Bug AI.' }]
+    });
 
-        if (geminiResponse.ok) {
-          const data = await geminiResponse.json();
-          console.log(`Chat success with model: ${model}`);
-          return Response.json(data);
-        }
+    const geminiModel = 'gemini-1.5-flash';
 
-        const errorData = await geminiResponse.json().catch(() => ({}));
-        
-        // If it's 404 (model not found), try the next model
-        if (geminiResponse.status === 404) {
-          console.log(`Model ${model} not found, trying next...`);
-          lastError = errorData;
-          continue;
-        }
-
-        // For other errors (auth, quota, etc.), return immediately
-        console.error(`Gemini API Error (${model}):`, geminiResponse.status, JSON.stringify(errorData));
-        return Response.json(
-          { error: errorData.error?.message || 'Gemini API Error', details: JSON.stringify(errorData) },
-          { status: geminiResponse.status }
-        );
-      } catch (fetchErr) {
-        lastError = fetchErr;
-        continue;
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          contents: geminiHistory,
+          ...(webSearch && { tools: [{ googleSearch: {} }] })
+        })
       }
-    }
-
-    // All models failed
-    return Response.json(
-      { error: 'No available Gemini model found.', details: JSON.stringify(lastError) },
-      { status: 500 }
     );
+
+    if (geminiResponse.ok) {
+      const data = await geminiResponse.json();
+      const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      
+      // Save AI Response to memory
+      chat.messages.push({ role: 'model', text: textResponse });
+      await chat.save();
+
+      return Response.json(data);
+    } else {
+      const errorData = await geminiResponse.json().catch(() => ({}));
+      return Response.json(
+        { error: errorData.error?.message || 'Gemini API Error' },
+        { status: geminiResponse.status }
+      );
+    }
 
   } catch (error) {
     console.error('Chat API Error:', error);

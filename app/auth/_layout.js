@@ -1,10 +1,11 @@
 import { Stack } from 'expo-router';
-import { COLORS } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * Auth stack layout — headerless screens for Login & Signup.
  */
 export default function AuthLayout() {
+  const { COLORS } = useTheme();
   return (
     <Stack
       screenOptions={{

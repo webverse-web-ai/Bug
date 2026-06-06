@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Pla
 import { router } from 'expo-router';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { CustomInput, CustomButton, SelectableCard } from '@/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { makeRedirectUri } from 'expo-auth-session';
@@ -26,6 +27,9 @@ function useDebounce(value, delay) {
 
 export default function SetupScreen() {
   const { user, saveGeminiToken, saveOpenRouterKey, completeSetup } = useAuth();
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
+  
   const [username, setUsername] = useState('');
   const debouncedUsername = useDebounce(username, 500);
   
@@ -352,7 +356,7 @@ export default function SetupScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORS.background },
   scrollContainer: { flexGrow: 1, padding: SPACING.xl, maxWidth: 600, width: '100%', alignSelf: 'center' },
   header: { marginBottom: SPACING.xl, marginTop: SPACING.xl },

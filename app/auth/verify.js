@@ -4,10 +4,13 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY, ROUNDED } from '@/constants/theme';
+import { SPACING, TYPOGRAPHY, ROUNDED } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { CustomButton } from '@/components/ui';
 
 export default function VerifyScreen() {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
   const { email, previewUrl } = useLocalSearchParams();
   const { verifyOTP } = useAuth();
   
@@ -121,7 +124,7 @@ export default function VerifyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

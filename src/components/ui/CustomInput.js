@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, TYPOGRAPHY, ROUNDED, SPACING } from '@/constants';
+import { TYPOGRAPHY, ROUNDED, SPACING } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * CustomInput component following the Cognitive Architecture design system.
@@ -16,7 +17,11 @@ export const CustomInput = ({
   error,
   isPassword = false,
   rightIcon,
+  ...props
 }) => {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
+  
   const [isFocused, setIsFocused] = useState(false);
   const [isSecure, setIsSecure] = useState(isPassword);
 
@@ -64,7 +69,7 @@ export const CustomInput = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     marginBottom: SPACING.md,
   },

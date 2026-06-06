@@ -84,7 +84,11 @@ export async function POST(request) {
         fullName: user.fullName,
         email: user.email,
         isVerified: user.isVerified,
-        authProvider: user.authProvider
+        authProvider: user.authProvider,
+        username: user.username,
+        path: user.path,
+        hasGeminiToken: !!user.geminiToken,
+        hasOpenRouterKey: !!user.openRouterKey
       }
     });
 

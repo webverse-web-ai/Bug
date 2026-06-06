@@ -17,11 +17,16 @@ import {
   CustomButton, 
   SocialLoginButtons 
 } from '@/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { validateEmail, validatePassword } from '@/utils/validation';
 
 export default function LoginScreen() {
+  const { login, error: authError, clearError, user } = useAuth();
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
+  
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,8 +34,6 @@ export default function LoginScreen() {
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const { login } = useAuth();
 
   const handleLogin = async () => {
     setErrorMessage('');
@@ -143,7 +146,7 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.background, // Deep charcoal canvas

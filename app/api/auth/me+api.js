@@ -31,6 +31,8 @@ export async function GET(request) {
           fullName: user.fullName,
           email: user.email,
           authProvider: user.authProvider,
+          username: user.username,
+          path: user.path,
           hasGeminiToken: !!user.geminiToken,
           hasOpenRouterKey: !!user.openRouterKey
         }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export const SelectableCard = ({
   icon,
@@ -10,6 +11,9 @@ export const SelectableCard = ({
   onPress,
   style,
 }) => {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
+  
   return (
     <TouchableOpacity
       style={[
@@ -31,7 +35,7 @@ export const SelectableCard = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   card: {
     backgroundColor: COLORS.surfaceContainerLow,
     borderWidth: 1,

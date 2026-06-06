@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
-import { COLORS, TYPOGRAPHY, ROUNDED, SPACING } from '@/constants';
+import { TYPOGRAPHY, ROUNDED, SPACING } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * CustomButton component following the Cognitive Architecture design system.
@@ -18,8 +19,11 @@ export const CustomButton = ({
   disabled = false, 
   loading = false,
   icon,
-  style
+  style,
+  textStyle 
 }) => {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
   const isPrimary = variant === 'primary';
 
   return (
@@ -53,7 +57,7 @@ export const CustomButton = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   button: {
     height: 48,
     borderRadius: ROUNDED.default, // 8px

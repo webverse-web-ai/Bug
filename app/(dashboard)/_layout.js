@@ -1,10 +1,11 @@
 import { Stack, Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { View, ActivityIndicator } from 'react-native';
-import { COLORS } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function DashboardLayout() {
   const { user, loading } = useAuth();
+  const { COLORS } = useTheme();
 
   if (loading) {
     return (

@@ -12,11 +12,14 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CustomInput, CustomButton } from '@/components/ui';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 import { resetPassword } from '@/client/api/authService';
 import { validatePassword } from '@/utils/validation';
 
 export default function ResetPasswordScreen() {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
   const router = useRouter();
   const { email, previewUrl } = useLocalSearchParams();
   
@@ -150,7 +153,7 @@ export default function ResetPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.background,

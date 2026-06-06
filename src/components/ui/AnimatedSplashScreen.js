@@ -8,14 +8,14 @@ import Animated, {
   withSpring,
   Easing
 } from 'react-native-reanimated';
-import { COLORS } from '@/constants';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const NUM_DOTS = 12;
 const RADIUS = 70; // Distance of dots from center
 const DOT_SIZE = 8;
 const ANIMATION_DURATION = 2500; // Total duration before moving to app
 
-const Dot = ({ index }) => {
+const Dot = ({ index, styles }) => {
   const angle = (index / NUM_DOTS) * 2 * Math.PI;
   const x = Math.cos(angle) * RADIUS;
   const y = Math.sin(angle) * RADIUS;
@@ -31,6 +31,9 @@ const Dot = ({ index }) => {
 };
 
 export default function AnimatedSplashScreen({ onFinish }) {
+  const { COLORS } = useTheme();
+  const styles = getStyles(COLORS);
+  
   const containerOpacity = useSharedValue(1);
   const logoScale = useSharedValue(0);
   const logoOpacity = useSharedValue(0);
@@ -107,7 +110,7 @@ export default function AnimatedSplashScreen({ onFinish }) {
         {/* Orbiting Dots (No Pulse) */}
         <Animated.View style={[styles.dotsRing, animatedRingStyle]}>
           {Array.from({ length: NUM_DOTS }).map((_, index) => (
-            <Dot key={index} index={index} />
+            <Dot key={index} index={index} styles={styles} />
           ))}
         </Animated.View>
       </View>
@@ -122,7 +125,7 @@ export default function AnimatedSplashScreen({ onFinish }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (COLORS) => StyleSheet.create({
   container: {
     position: 'absolute',
     top: 0,

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -6,381 +6,189 @@ import {
   SafeAreaView, 
   TextInput, 
   TouchableOpacity, 
-  FlatList, 
   KeyboardAvoidingView, 
   Platform,
-  ActivityIndicator,
-  Keyboard
+  Animated,
+  Dimensions,
+  TouchableWithoutFeedback,
+  FlatList
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
-import * as SecureStore from 'expo-secure-store';
+import { useTheme } from '@/contexts/ThemeContext';
+import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import ChatInterface from '@/components/ChatInterface';
+
+const { width } = Dimensions.get('window');
 
 export default function DashboardIndex() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
-  const [messages, setMessages] = useState([
-    {
-      id: 'welcome-1',
-      role: 'model',
-      text: `Hello ${user?.fullName?.split(' ')[0] || 'there'}, what do you want to explore today?`
-    }
-  ]);
-  const [inputText, setInputText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const flatListRef = useRef(null);
+  const { themeMode, toggleTheme, COLORS } = useTheme();
+  const styles = getStyles(COLORS);
+  
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  
+  const drawerAnim = useRef(new Animated.Value(-300)).current;
+  const overlayAnim = useRef(new Animated.Value(0)).current;
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (messages.length > 0 && flatListRef.current) {
-      setTimeout(() => {
-        flatListRef.current.scrollToEnd({ animated: true });
-      }, 100);
+  const { logout } = useAuth();
+
+  const toggleDrawer = () => {
+    if (isDrawerOpen) {
+      Animated.parallel([
+        Animated.timing(drawerAnim, { toValue: -300, duration: 300, useNativeDriver: true }),
+        Animated.timing(overlayAnim, { toValue: 0, duration: 300, useNativeDriver: true })
+      ]).start(() => setIsDrawerOpen(false));
+    } else {
+      setIsDrawerOpen(true);
+      Animated.parallel([
+        Animated.timing(drawerAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+        Animated.timing(overlayAnim, { toValue: 1, duration: 300, useNativeDriver: true })
+      ]).start();
     }
-  }, [messages]);
+  };
 
   const handleLogout = async () => {
-    setIsMenuOpen(false);
+    toggleDrawer();
     await logout();
   };
 
   const handleGoToSetup = () => {
-    setIsMenuOpen(false);
+    toggleDrawer();
     import('expo-router').then(({ router }) => router.replace('/setup'));
-  };
-
-  const handleSend = async () => {
-    if (!inputText.trim()) return;
-
-    const userMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      text: inputText.trim()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
-    setLoading(true);
-    Keyboard.dismiss();
-
-    try {
-      if (!user?.hasOpenRouterKey && !user?.hasGeminiToken) {
-        throw new Error('No AI connected. Please go to Setup and connect your OpenRouter or Gemini account.');
-      }
-
-      // Get the backend JWT token
-      let token = null;
-      if (Platform.OS === 'web') {
-        token = localStorage.getItem('jwt_token');
-      } else {
-        token = await SecureStore.getItemAsync('jwt_token');
-      }
-
-      if (!token) {
-        throw new Error('You must be logged in to chat.');
-      }
-
-      // Format history for Gemini API
-      const apiContents = messages
-        .filter(m => m.id !== 'welcome-1') // Gemini expects strictly alternating user/model roles, so let's just pass the real chat
-        .concat(userMessage)
-        .map(msg => ({
-          role: msg.role === 'model' ? 'model' : 'user',
-          parts: [{ text: msg.text }]
-        }));
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ contents: apiContents })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || data.details || 'Failed to get response');
-      }
-
-      // Parse Gemini response
-      const modelText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from model.';
-      
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'model',
-        text: modelText
-      }]);
-
-    } catch (error) {
-      console.error('Chat Error:', error);
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'model',
-        text: `Error: ${error.message}`
-      }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const renderMessage = ({ item }) => {
-    const isModel = item.role === 'model';
-    return (
-      <View style={[styles.messageWrapper, isModel ? styles.messageWrapperModel : styles.messageWrapperUser]}>
-        {isModel && (
-          <View style={styles.aiAvatar}>
-            <MaterialCommunityIcons name="star-four-points" size={16} color={COLORS.primary} />
-          </View>
-        )}
-        <View style={[styles.messageBubble, isModel ? styles.messageBubbleModel : styles.messageBubbleUser]}>
-          <Text style={[styles.messageText, isModel ? styles.messageTextModel : styles.messageTextUser]}>
-            {item.text}
-          </Text>
-        </View>
-      </View>
-    );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView 
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        {/* Header */}
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        
+        {/* Top App Bar */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => setIsMenuOpen(!isMenuOpen)} style={styles.headerIcon}>
-            <MaterialCommunityIcons name="menu" size={28} color={COLORS.onSurface} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Bug AI</Text>
-          <View style={styles.headerIcon}>
-            <MaterialCommunityIcons name="account-circle-outline" size={28} color={COLORS.onSurfaceVariant} />
+          <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={toggleDrawer} style={styles.iconButton}>
+              <MaterialCommunityIcons name="menu" size={24} color={COLORS.primary} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Bug AI</Text>
+          </View>
+
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.iconButton} onPress={toggleTheme}>
+              <MaterialCommunityIcons 
+                name={themeMode === 'dark' ? "weather-sunny" : "weather-night"} 
+                size={22} 
+                color={COLORS.onSurfaceVariant} 
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
-        {/* Dropdown Menu */}
-        {isMenuOpen && (
-          <View style={styles.dropdownMenu}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleGoToSetup}>
-              <MaterialCommunityIcons name="cog-outline" size={20} color={COLORS.onSurface} />
-              <Text style={styles.menuItemText}>Setup Page</Text>
-            </TouchableOpacity>
-            <View style={styles.menuDivider} />
-            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-              <MaterialCommunityIcons name="logout" size={20} color={COLORS.error} />
-              <Text style={[styles.menuItemText, { color: COLORS.error }]}>Log out</Text>
-            </TouchableOpacity>
-          </View>
+        {/* Chat Component */}
+        <ChatInterface />
+
+        {/* Sliding Navigation Drawer */}
+        {isDrawerOpen && (
+          <TouchableWithoutFeedback onPress={toggleDrawer}>
+            <Animated.View style={[styles.drawerOverlay, { opacity: overlayAnim }]} />
+          </TouchableWithoutFeedback>
         )}
-
-        {/* Chat History */}
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          keyExtractor={item => item.id}
-          renderItem={renderMessage}
-          contentContainerStyle={styles.chatContainer}
-          showsVerticalScrollIndicator={false}
-        />
-
-        {/* Input Area (Perplexity Style) */}
-        <View style={styles.inputContainerWrapper}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Ask anything..."
-              placeholderTextColor={COLORS.onSurfaceVariant}
-              value={inputText}
-              onChangeText={setInputText}
-              multiline
-              maxLength={2000}
-            />
-            <View style={styles.inputActions}>
-              <TouchableOpacity style={styles.actionButton}>
-                <MaterialCommunityIcons name="paperclip" size={20} color={COLORS.onSurfaceVariant} />
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.sendButton, inputText.trim().length > 0 && styles.sendButtonActive]} 
-                onPress={handleSend}
-                disabled={loading || !inputText.trim()}
-              >
-                {loading ? (
-                  <ActivityIndicator size="small" color={COLORS.onPrimary} />
-                ) : (
-                  <MaterialCommunityIcons 
-                    name="arrow-up" 
-                    size={20} 
-                    color={inputText.trim().length > 0 ? COLORS.onPrimary : COLORS.onSurfaceVariant} 
-                  />
-                )}
-              </TouchableOpacity>
+        <Animated.View style={[styles.drawer, { transform: [{ translateX: drawerAnim }] }]}>
+          <View style={styles.drawerHeader}>
+            <View style={styles.logoRow}>
+              <MaterialCommunityIcons name="bug" size={28} color={COLORS.primary} />
+              <Text style={styles.drawerTitle}>BUG BOS</Text>
             </View>
+            <TouchableOpacity onPress={toggleDrawer} style={styles.iconButton}>
+              <MaterialCommunityIcons name="close" size={24} color={COLORS.onSurfaceVariant} />
+            </TouchableOpacity>
           </View>
-        </View>
+          
+          <View style={styles.drawerLinks}>
+            <TouchableOpacity style={styles.drawerLinkActive}>
+              <MaterialCommunityIcons name="chat-outline" size={20} color={COLORS.onPrimaryContainer} />
+              <Text style={styles.drawerLinkTextActive}>Chat Sessions</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.drawerLink}>
+              <MaterialCommunityIcons name="database" size={20} color={COLORS.onSurfaceVariant} />
+              <Text style={styles.drawerLinkText}>Knowledge Base</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.drawerLink}>
+              <MaterialCommunityIcons name="chart-line" size={20} color={COLORS.onSurfaceVariant} />
+              <Text style={styles.drawerLinkText}>System Metrics</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.drawerLink} onPress={handleGoToSetup}>
+              <MaterialCommunityIcons name="cog" size={20} color={COLORS.onSurfaceVariant} />
+              <Text style={styles.drawerLinkText}>Settings</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.drawerFooter}>
+            <TouchableOpacity style={styles.drawerLink} onPress={handleLogout}>
+              <MaterialCommunityIcons name="logout" size={20} color={COLORS.error} />
+              <Text style={[styles.drawerLinkText, { color: COLORS.error }]}>Log out</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
 
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  container: {
-    flex: 1,
-  },
+const getStyles = (COLORS) => StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  container: { flex: 1, position: 'relative' },
+  
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    height: 64,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.outlineVariant,
-    position: 'relative',
+    backgroundColor: COLORS.surface,
     zIndex: 10,
   },
-  headerIcon: {
-    padding: SPACING.xs,
-    width: 40,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    ...TYPOGRAPHY.headlineMd,
-    color: COLORS.onSurface,
-  },
-  dropdownMenu: {
-    position: 'absolute',
-    top: 60,
-    left: SPACING.lg,
-    backgroundColor: COLORS.surfaceContainerHigh,
-    borderRadius: ROUNDED.lg,
-    padding: SPACING.xs,
-    minWidth: 180,
-    zIndex: 100,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: COLORS.outlineVariant,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: SPACING.md,
-    gap: SPACING.sm,
-    borderRadius: ROUNDED.md,
-  },
-  menuItemText: {
-    ...TYPOGRAPHY.bodyLg,
-    color: COLORS.onSurface,
-  },
-  menuDivider: {
-    height: 1,
-    backgroundColor: COLORS.outlineVariant,
-    marginVertical: SPACING.xs,
-    marginHorizontal: SPACING.sm,
-  },
-  chatContainer: {
-    padding: SPACING.lg,
-    paddingBottom: SPACING.xl,
-  },
-  messageWrapper: {
-    flexDirection: 'row',
-    marginBottom: SPACING.lg,
-    alignItems: 'flex-start',
-  },
-  messageWrapperUser: {
-    justifyContent: 'flex-end',
-  },
-  messageWrapperModel: {
-    justifyContent: 'flex-start',
-    paddingRight: SPACING.xl, // keep it from touching right edge
-  },
-  aiAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: ROUNDED.md,
-    backgroundColor: COLORS.surfaceContainerHigh,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: SPACING.sm,
-    borderWidth: 1,
-    borderColor: COLORS.outlineVariant,
-  },
-  messageBubble: {
-    padding: SPACING.md,
-    borderRadius: ROUNDED.lg,
-    maxWidth: '85%',
-  },
-  messageBubbleUser: {
-    backgroundColor: COLORS.surfaceContainerHigh,
-    borderBottomRightRadius: ROUNDED.sm,
-  },
-  messageBubbleModel: {
-    backgroundColor: 'transparent',
-    padding: 0,
-    marginTop: SPACING.xs,
-  },
-  messageText: {
-    ...TYPOGRAPHY.bodyLg,
-  },
-  messageTextUser: {
-    color: COLORS.onSurface,
-  },
-  messageTextModel: {
-    color: COLORS.onSurface,
-    lineHeight: 28,
-  },
-  inputContainerWrapper: {
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.lg,
-    paddingTop: SPACING.sm,
-    backgroundColor: COLORS.background,
-  },
-  inputContainer: {
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  iconButton: { padding: SPACING.xs, borderRadius: ROUNDED.full },
+  headerTitle: { ...TYPOGRAPHY.headlineMd, fontWeight: '800', color: COLORS.onSurface },
+  modelPill: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACING.xs,
     backgroundColor: COLORS.surfaceContainerLow,
-    borderWidth: 1,
-    borderColor: COLORS.outlineVariant,
-    borderRadius: ROUNDED.xl,
-    padding: SPACING.sm,
-    minHeight: 120,
-    justifyContent: 'space-between',
+    borderWidth: 1, borderColor: COLORS.outlineVariant,
+    paddingHorizontal: SPACING.sm, paddingVertical: 4,
+    borderRadius: ROUNDED.full
   },
-  textInput: {
-    ...TYPOGRAPHY.bodyLg,
-    color: COLORS.onSurface,
-    padding: SPACING.sm,
-    paddingTop: SPACING.sm,
-    maxHeight: 150,
+  modelPillText: { ...TYPOGRAPHY.labelSm, color: COLORS.onSurface },
+
+  // Drawer
+  drawerOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 40 },
+  drawer: { 
+    position: 'absolute', top: 0, left: 0, bottom: 0, width: 280, 
+    backgroundColor: COLORS.surfaceContainerLow, 
+    borderRightWidth: 1, borderRightColor: COLORS.outlineVariant,
+    zIndex: 50, paddingVertical: SPACING.lg
   },
-  inputActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: SPACING.sm,
-    paddingHorizontal: SPACING.sm,
-  },
-  actionButton: {
-    padding: SPACING.sm,
-  },
-  sendButton: {
-    width: 36,
-    height: 36,
-    borderRadius: ROUNDED.full,
-    backgroundColor: COLORS.surfaceContainerHigh,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sendButtonActive: {
-    backgroundColor: COLORS.primary,
-  }
+  drawerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.md, marginBottom: SPACING.lg },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  drawerTitle: { ...TYPOGRAPHY.headlineMd, fontWeight: 'bold', color: COLORS.primary },
+  drawerLinks: { flex: 1, paddingHorizontal: SPACING.sm, gap: 4 },
+  drawerLink: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, padding: SPACING.md, borderRadius: ROUNDED.lg },
+  drawerLinkActive: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, padding: SPACING.md, borderRadius: ROUNDED.lg, backgroundColor: COLORS.secondaryContainer },
+  drawerLinkText: { ...TYPOGRAPHY.labelMd, color: COLORS.onSurfaceVariant },
+  drawerLinkTextActive: { ...TYPOGRAPHY.labelMd, color: COLORS.onSecondaryContainer },
+  drawerFooter: { paddingHorizontal: SPACING.md, paddingTop: SPACING.md, borderTopWidth: 1, borderTopColor: `${COLORS.outlineVariant}80` },
+
+  // Modals
+  modalOverlayView: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: COLORS.background, borderTopLeftRadius: ROUNDED.xl, borderTopRightRadius: ROUNDED.xl, height: '80%', padding: SPACING.lg },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg },
+  modalTitle: { ...TYPOGRAPHY.headlineMd, color: COLORS.onSurface },
+  searchInput: { backgroundColor: COLORS.surfaceContainerLow, borderRadius: ROUNDED.lg, padding: SPACING.md, color: COLORS.onSurface, marginBottom: SPACING.md, ...TYPOGRAPHY.bodyMd, borderWidth: 1, borderColor: COLORS.outlineVariant },
+  sectionHeader: { ...TYPOGRAPHY.labelMd, color: COLORS.onSurfaceVariant, marginTop: SPACING.lg, marginBottom: SPACING.sm, textTransform: 'uppercase' },
+  modelItem: { flexDirection: 'row', justifyContent: 'space-between', padding: SPACING.md, borderRadius: ROUNDED.md, backgroundColor: COLORS.surfaceContainerLow, marginBottom: SPACING.xs, borderWidth: 1, borderColor: 'transparent' },
+  modelItemActive: { borderWidth: 1, borderColor: COLORS.primary },
+  modelItemText: { ...TYPOGRAPHY.bodyMd, color: COLORS.onSurface },
+  modelItemTextActive: { color: COLORS.primary, fontWeight: 'bold' },
 });
