@@ -118,6 +118,7 @@ export default function ChatInterface() {
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   
   const flatListRef = useRef(null);
+  const [showScrollDown, setShowScrollDown] = useState(false);
   const dropdownAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -169,12 +170,18 @@ export default function ChatInterface() {
   };
 
   useEffect(() => {
-    if (messages.length > 0 && flatListRef.current) {
+    if (messages.length > 0 && flatListRef.current && !showScrollDown) {
       setTimeout(() => {
-        flatListRef.current.scrollToEnd({ animated: true });
+        flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
-  }, [messages]);
+  }, [messages, loading]);
+
+  const handleScroll = (event) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 150;
+    setShowScrollDown(!isCloseToBottom);
+  };
 
   const toggleModelSelector = () => {
     if (isModelSelectorOpen) {
@@ -327,9 +334,24 @@ export default function ChatInterface() {
           contentContainerStyle={styles.chatContainer}
           showsVerticalScrollIndicator={false}
           ListFooterComponent={loading ? <ThinkingAnimation isWebSearch={webSearchEnabled} /> : null}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          onContentSizeChange={() => {
+            if (!showScrollDown) flatListRef.current?.scrollToEnd({ animated: false });
+          }}
+          onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
           onScrollBeginDrag={() => { if (isModelSelectorOpen) toggleModelSelector(); Keyboard.dismiss(); }}
           keyboardShouldPersistTaps="handled"
         />
+      )}
+
+      {showScrollDown && (
+        <TouchableOpacity
+          style={styles.scrollDownButton}
+          onPress={() => flatListRef.current?.scrollToEnd({ animated: true })}
+        >
+          <MaterialCommunityIcons name="arrow-down-circle" size={32} color={COLORS.primary} style={{ opacity: 0.8 }} />
+        </TouchableOpacity>
       )}
 
       {/* Bottom Input Area */}
@@ -487,6 +509,15 @@ const getStyles = (COLORS) => StyleSheet.create({
       marginVertical: SPACING.sm,
     },
     link: { color: COLORS.primary, textDecorationLine: 'none' },
+  },
+
+  scrollDownButton: {
+    position: 'absolute',
+    bottom: 90,
+    right: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
   },
 
   messageRowUser: { flexDirection: 'col', marginBottom: SPACING.lg, alignItems: 'flex-end', marginTop: SPACING.md },
