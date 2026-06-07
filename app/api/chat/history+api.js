@@ -44,8 +44,8 @@ export async function GET(request) {
     }
 
     // Format for frontend
-    const formattedMessages = chat.messages.map(msg => ({
-      id: msg._id.toString(),
+    const formattedMessages = chat.messages.map((msg, idx) => ({
+      id: msg._id ? msg._id.toString() : msg.id ? msg.id.toString() : idx.toString(),
       role: msg.role,
       text: msg.text,
       attachments: msg.attachments || []

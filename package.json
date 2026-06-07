@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "emulators": "npx -y firebase-tools@latest emulators:start --only firestore"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -31,8 +32,8 @@
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
     "expo-web-browser": "~15.0.11",
+    "firebase-admin": "^13.10.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.6.3",
     "nodemailer": "^8.0.10",
     "react": "19.1.0",
     "react-dom": "19.1.0",

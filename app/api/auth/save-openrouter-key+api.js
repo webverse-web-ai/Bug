@@ -45,15 +45,12 @@ export async function POST(request) {
 
 
     // Update user in DB
-    const user = await User.findByIdAndUpdate(
-      decoded.id,
-      { openRouterKey: openRouterKey },
-      { new: true }
-    );
-
+    const user = await User.findById(decoded.id);
     if (!user) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
+    
+    await User.update(decoded.id, { openRouterKey: openRouterKey });
 
     return Response.json({ success: true, message: 'OpenRouter Key saved successfully' }, { status: 200 });
   } catch (error) {

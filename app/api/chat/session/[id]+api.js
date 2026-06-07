@@ -26,11 +26,11 @@ export async function PUT(request, { id }) {
       return Response.json({ error: 'Invalid title' }, { status: 400 });
     }
 
-    const chat = await Chat.findOneAndUpdate(
-      { _id: id, user: user.id },
-      { title },
-      { new: true }
-    );
+    const chat = await Chat.findOne({ _id: id, user: user.id });
+    if (!chat) return Response.json({ error: 'Session not found' }, { status: 404 });
+    
+    await Chat.update(id, { title });
+    chat.title = title;
     
     if (!chat) return Response.json({ error: 'Session not found' }, { status: 404 });
     return Response.json({ session: { id: chat._id.toString(), title: chat.title } }, { status: 200 });
@@ -46,8 +46,10 @@ export async function DELETE(request, { id }) {
     const user = await authenticate(request);
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const chat = await Chat.findOneAndDelete({ _id: id, user: user.id });
+    const chat = await Chat.findOne({ _id: id, user: user.id });
     if (!chat) return Response.json({ error: 'Session not found' }, { status: 404 });
+    
+    await Chat.findByIdAndDelete(id);
     
     return Response.json({ success: true }, { status: 200 });
   } catch (error) {

@@ -21,10 +21,7 @@ export async function GET(request) {
       return Response.json({ error: 'Unauthorized, invalid token' }, { status: 401 });
     }
 
-    // Sort by updatedAt descending
-    const sessions = await Chat.find({ user: decoded.id })
-      .select('title updatedAt createdAt')
-      .sort({ updatedAt: -1 });
+    const sessions = await Chat.find({ user: decoded.id });
 
     // Ensure _id is sent as id for frontend convenience
     const formattedSessions = sessions.map(s => ({

@@ -1,34 +1,48 @@
-import mongoose from 'mongoose';
+import { firestore } from '../lib/db';
 
-const messageSchema = new mongoose.Schema({
-  role: {
-    type: String,
-    enum: ['user', 'model'],
-    required: true
-  },
-  text: {
-    type: String,
-    default: ''
-  },
-  attachments: [{
-    type: String // base64 or URL
-  }]
-}, { timestamps: true });
+const Chat = {
+  collection: firestore.collection('chats'),
 
-const chatSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  async findOne(query) {
+    if (query._id && query.user) {
+      const doc = await this.collection.doc(query._id).get();
+      if (!doc.exists) return null;
+      const data = doc.data();
+      if (data.user !== query.user) return null;
+      return { _id: doc.id, ...data };
+    }
+    return null;
   },
-  title: {
-    type: String,
-    default: 'New Chat'
-  },
-  messages: [messageSchema]
-}, { timestamps: true });
 
-// Avoid OverwriteModelError in Next.js/Expo API hot reloads
-const Chat = mongoose.models.Chat || mongoose.model('Chat', chatSchema);
+  async find(query) {
+    if (query.user) {
+      const snapshot = await this.collection
+        .where('user', '==', query.user)
+        .orderBy('updatedAt', 'desc')
+        .get();
+      return snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
+    }
+    return [];
+  },
+
+  async findByIdAndDelete(id) {
+    await this.collection.doc(id).delete();
+  },
+
+  async create(data) {
+    const chatData = {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const docRef = await this.collection.add(chatData);
+    return { _id: docRef.id, ...chatData };
+  },
+
+  async update(id, data) {
+    data.updatedAt = new Date();
+    await this.collection.doc(id).update(data);
+  }
+};
 
 export default Chat;

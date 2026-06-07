@@ -17,14 +17,10 @@ export async function POST(request) {
     }
 
     // Find the latest OTP for the email
-    const otpRecord = await OTP.findOne({ email }).sort({ createdAt: -1 });
+    const otpRecord = await OTP.findOne({ email, otp });
 
     if (!otpRecord) {
-      return Response.json({ error: 'OTP expired or not found' }, { status: 400 });
-    }
-
-    if (otpRecord.otp !== otp) {
-      return Response.json({ error: 'Invalid OTP code' }, { status: 400 });
+      return Response.json({ error: 'OTP expired, not found, or invalid' }, { status: 400 });
     }
 
     // OTP is valid! Find user and mark as verified
@@ -34,8 +30,8 @@ export async function POST(request) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
+    await User.update(user._id, { isVerified: true });
     user.isVerified = true;
-    await user.save();
 
     // Delete the OTP as it's been used
     await OTP.deleteMany({ email });

@@ -1,67 +1,64 @@
-import mongoose from 'mongoose';
+import { firestore } from '../lib/db';
 import bcrypt from 'bcryptjs';
 
-const UserSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      unique: true,
-      sparse: true,
-      trim: true,
-      lowercase: true,
-    },
-    fullName: {
-      type: String,
-      required: [true, 'Please provide a full name'],
-    },
-    email: {
-      type: String,
-      required: [true, 'Please provide an email'],
-      unique: true,
-      lowercase: true,
-    },
-    password: {
-      type: String,
-      minlength: 6,
-      select: false, // Don't return password by default
-    },
-    authProvider: {
-      type: String,
-      enum: ['local', 'google', 'facebook'],
-      default: 'local',
-    },
-    providerId: {
-      type: String,
-      default: null,
-    },
-    geminiToken: {
-      type: String,
-      default: null,
-    },
-    openRouterKey: {
-      type: String,
-      default: null,
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
+const User = {
+  collection: firestore.collection('users'),
+
+  async findOne(query) {
+    if (query.email) {
+      const snapshot = await this.collection.where('email', '==', query.email.toLowerCase()).limit(1).get();
+      if (snapshot.empty) return null;
+      const doc = snapshot.docs[0];
+      return { _id: doc.id, ...doc.data() };
+    }
+    if (query.username) {
+      const snapshot = await this.collection.where('username', '==', query.username.toLowerCase()).limit(1).get();
+      if (snapshot.empty) return null;
+      const doc = snapshot.docs[0];
+      return { _id: doc.id, ...doc.data() };
+    }
+    return null;
   },
-  { timestamps: true }
-);
 
-// Hash password before saving
-UserSchema.pre('save', async function () {
-  if (!this.isModified('password')) {
-    return;
+  async findById(id) {
+    const doc = await this.collection.doc(id).get();
+    if (!doc.exists) return null;
+    return { _id: doc.id, ...doc.data() };
+  },
+
+  async create(data) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
+    
+    const userData = {
+      ...data,
+      email: data.email.toLowerCase(),
+      password: hashedPassword,
+      authProvider: data.authProvider || 'local',
+      providerId: data.providerId || null,
+      geminiToken: data.geminiToken || null,
+      openRouterKey: data.openRouterKey || null,
+      isVerified: data.isVerified || false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    const docRef = await this.collection.add(userData);
+    return { _id: docRef.id, ...userData };
+  },
+
+  async update(id, data) {
+    if (data.password) {
+      const salt = await bcrypt.genSalt(10);
+      data.password = await bcrypt.hash(data.password, salt);
+    }
+    data.updatedAt = new Date();
+    await this.collection.doc(id).update(data);
+  },
+
+  async matchPassword(enteredPassword, userHash) {
+    return await bcrypt.compare(enteredPassword, userHash);
   }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
-
-// Method to check password validity
-UserSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+export default User;

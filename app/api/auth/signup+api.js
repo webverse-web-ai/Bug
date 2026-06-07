@@ -23,13 +23,11 @@ export async function POST(request) {
 
     if (!user) {
       // Create new unverified user
-      user = new User({ fullName, email, password });
-      await user.save();
+      user = await User.create({ fullName, email, password });
     } else {
       // User exists but unverified, update their password and name
+      await User.update(user._id, { fullName, email, password });
       user.fullName = fullName;
-      user.password = password;
-      await user.save();
     }
 
     // Generate 6-digit OTP

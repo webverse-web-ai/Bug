@@ -1,7 +1,6 @@
 import connectToDatabase from '@/server/lib/db';
 import User from '@/server/models/User';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
@@ -11,7 +10,7 @@ export async function POST(request) {
     console.log('MONGODB_URI starts with:', process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 15) : 'undefined');
     
     await connectToDatabase();
-    console.log('MongoDB connected state:', mongoose.connection.readyState);
+    console.log('Firebase connected');
     
     const body = await request.json();
     const { email, password } = body;
@@ -20,8 +19,8 @@ export async function POST(request) {
       return Response.json({ error: 'Please provide email and password' }, { status: 400 });
     }
 
-    // Find user by email and explicitly select the password field so we can compare it
-    const user = await User.findOne({ email }).select('+password');
+    // Find user by email
+    const user = await User.findOne({ email });
 
     if (!user) {
       return Response.json({ error: "You don't have a registered account yet. Please create one." }, { status: 401 });
@@ -36,7 +35,7 @@ export async function POST(request) {
     }
 
     // Check password
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await User.matchPassword(password, user.password);
     if (!isMatch) {
       return Response.json({ error: 'Invalid credentials' }, { status: 401 });
     }

@@ -51,7 +51,7 @@ async function generateChatTitle(userText, user, modelId) {
     } else if (user.geminiToken) {
       const apiKey = process.env.GEMINI_API_KEY;
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/antigravity-preview-05-2026:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -120,7 +120,7 @@ export async function POST(request) {
         return Response.json({ error: 'Session not found' }, { status: 404 });
       }
     } else {
-      chat = new Chat({ user: user._id, title: 'New Chat', messages: [] });
+      chat = { user: user._id, title: 'New Chat', messages: [] };
       isNewChat = true;
     }
 
@@ -130,7 +130,12 @@ export async function POST(request) {
       text: latestUserMessageText,
       attachments: attachments
     });
-    await chat.save();
+    
+    if (isNewChat) {
+      chat = await Chat.create(chat);
+    } else {
+      await Chat.update(chat._id, { messages: chat.messages });
+    }
 
     // Reconstruct full chat history for the AI Context
     const fullHistory = chat.messages.map(msg => ({
@@ -188,8 +193,11 @@ export async function POST(request) {
           chat.messages.push({ role: 'model', text: textResponse });
           if (isNewChat) {
             chat.title = await generateChatTitle(latestUserMessageText, user, modelId);
+            await Chat.update(chat._id, { messages: chat.messages, title: chat.title });
+            isNewChat = false;
+          } else {
+            await Chat.update(chat._id, { messages: chat.messages });
           }
-          await chat.save();
 
           return Response.json({
             candidates: [
@@ -239,7 +247,7 @@ export async function POST(request) {
       parts: [{ text: 'Understood. I am Bug, CEO of Bug AI.' }]
     });
 
-    const geminiModel = 'gemini-1.5-flash';
+    const geminiModel = 'antigravity-preview-05-2026';
 
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`,
@@ -264,18 +272,36 @@ export async function POST(request) {
       chat.messages.push({ role: 'model', text: textResponse });
       if (isNewChat) {
         chat.title = await generateChatTitle(latestUserMessageText, user, modelId);
+        await Chat.update(chat._id, { messages: chat.messages, title: chat.title });
+        isNewChat = false;
+      } else {
+        await Chat.update(chat._id, { messages: chat.messages });
       }
-      await chat.save();
 
       data.sessionId = chat._id.toString();
       data.title = chat.title;
       return Response.json(data);
     } else {
       const errorData = await geminiResponse.json().catch(() => ({}));
-      return Response.json(
-        { error: errorData.error?.message || 'Gemini API Error' },
-        { status: geminiResponse.status }
-      );
+      console.error('Gemini API failed:', errorData.error?.message);
+      
+      const fallbackText = "⚠️ I'm having trouble connecting to my AI brain right now, but your message was saved!";
+      chat.messages.push({ role: 'model', text: fallbackText });
+      
+      if (isNewChat) {
+        chat.title = fallbackTitle(latestUserMessageText);
+        await Chat.update(chat._id, { messages: chat.messages, title: chat.title });
+        isNewChat = false;
+      } else {
+        await Chat.update(chat._id, { messages: chat.messages });
+      }
+
+      return Response.json({
+        candidates: [{ content: { parts: [{ text: fallbackText }], role: 'model' } }],
+        sessionId: chat._id.toString(),
+        title: chat.title || 'New Chat',
+        error: errorData.error?.message || 'Gemini API Error'
+      }, { status: 200 }); // Return 200 so the UI can show the fallback message
     }
 
   } catch (error) {

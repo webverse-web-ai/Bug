@@ -33,25 +33,25 @@ export async function POST(request) {
     }
 
     // Check if username is already taken by someone else
-    const existingUser = await User.findOne({ 
-      username: { $regex: new RegExp(`^${username.trim()}$`, 'i') },
-      _id: { $ne: decoded.id } 
-    });
+    const existingUser = await User.findOne({ username: username.trim().toLowerCase() });
 
-    if (existingUser) {
+    if (existingUser && existingUser._id !== decoded.id) {
       return Response.json({ error: 'Username is already taken' }, { status: 400 });
     }
 
     // Update user
-    const updatedUser = await User.findByIdAndUpdate(
-      decoded.id,
-      { username: username.trim().toLowerCase() },
-      { new: true }
-    );
-
-    if (!updatedUser) {
+    const updatedUserDoc = await User.findById(decoded.id);
+    if (!updatedUserDoc) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
+
+    await User.update(decoded.id, { 
+      username: username.trim().toLowerCase(),
+      path: path
+    });
+    
+    // Merge for response
+    const updatedUser = { ...updatedUserDoc, username: username.trim().toLowerCase() };
 
     // In a real app, you might also want to save the `path` (create/join team)
     // For now, we just save the username successfully.

@@ -1,19 +1,40 @@
-import mongoose from 'mongoose';
+import { firestore } from '../lib/db';
 
-const OTPSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-  },
-  otp: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: 600, // The document will be automatically deleted after 10 minutes
-  },
-});
+const OTP = {
+  collection: firestore.collection('otps'),
 
-export default mongoose.models.OTP || mongoose.model('OTP', OTPSchema);
+  async create(data) {
+    const otpData = {
+      ...data,
+      createdAt: new Date()
+    };
+    const docRef = await this.collection.add(otpData);
+    return { _id: docRef.id, ...otpData };
+  },
+
+  async findOne(query) {
+    if (query.email && query.otp) {
+      const snapshot = await this.collection
+        .where('email', '==', query.email)
+        .where('otp', '==', query.otp)
+        .limit(1).get();
+      if (snapshot.empty) return null;
+      const doc = snapshot.docs[0];
+      return { _id: doc.id, ...doc.data() };
+    }
+    return null;
+  },
+
+  async deleteMany(query) {
+    if (query.email) {
+      const snapshot = await this.collection.where('email', '==', query.email).get();
+      const batch = firestore.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+    }
+  }
+};
+
+export default OTP;

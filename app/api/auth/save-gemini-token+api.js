@@ -26,15 +26,14 @@ export async function POST(request) {
         return Response.json({ error: 'Access token is required' }, { status: 400 });
       }
 
-      const user = await User.findByIdAndUpdate(
-        decoded.id, 
-        { geminiToken: accessToken },
-        { new: true }
-      );
-
-      if (!user) {
+      const userDoc = await User.findById(decoded.id);
+      if (!userDoc) {
         return Response.json({ error: 'User not found' }, { status: 404 });
       }
+
+      await User.update(decoded.id, { geminiToken: accessToken });
+
+      // user check handled above
 
       return Response.json({
         success: true,
