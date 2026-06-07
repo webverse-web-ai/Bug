@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "emulators": "npx -y firebase-tools@latest emulators:start --only firestore"
+    "emulators": "npx -y firebase-tools@latest emulators:start --only firestore --import=./.firebase-data --export-on-exit=./.firebase-data"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",

@@ -13,9 +13,9 @@ export async function GET(request) {
     await connectToDatabase();
 
     // Check if user already exists with this username
-    // Use case-insensitive search
+    // User.findOne handles case-insensitivity internally
     const existingUser = await User.findOne({ 
-      username: { $regex: new RegExp(`^${username.trim()}$`, 'i') } 
+      username: username.trim()
     });
 
     return Response.json({ 
