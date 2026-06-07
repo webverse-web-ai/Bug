@@ -1,6 +1,7 @@
 import connectToDatabase from '@/server/lib/db';
 import User from '@/server/models/User';
 import Chat from '@/server/models/Chat';
+import Knowledge from '@/server/models/Knowledge';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
@@ -71,6 +72,93 @@ async function generateChatTitle(userText, user, modelId) {
   return fallbackTitle(userText);
 }
 
+// Normalize text for cheap duplicate detection.
+function normalizeFact(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// Best-effort parse of a JSON array of {title, content} from model output.
+function parseFacts(raw) {
+  if (!raw) return [];
+  let text = raw.trim();
+  const start = text.indexOf('[');
+  const end = text.lastIndexOf(']');
+  if (start !== -1 && end !== -1) text = text.slice(start, end + 1);
+  try {
+    const arr = JSON.parse(text);
+    if (Array.isArray(arr)) return arr.filter(f => f && f.content);
+  } catch {
+    /* not valid JSON */
+  }
+  return [];
+}
+
+// Self-learning: extract durable facts about the user from their message and
+// save any that aren't already known (tagged source: 'ai'). Fire-and-forget.
+async function learnFromMessage(user, userText, modelId) {
+  if (!userText || userText.trim().length < 4) return;
+
+  const prompt = `From the user's message, extract durable, long-term facts about the USER that are worth remembering across future conversations — for example their name, username, location, job/role, and stable preferences. Ignore questions, requests, opinions about others, and small talk. Return ONLY a compact JSON array like [{"title":"Name","content":"The user's name is Devaman"}]. Return [] if there is nothing durable to remember.\n\nUser message: """${userText}"""`;
+
+  let raw = '';
+  try {
+    if (user.openRouterKey) {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${user.openRouterKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://bugai.com',
+          'X-Title': 'Bug AI',
+        },
+        body: JSON.stringify({
+          model: modelId && modelId !== 'google/gemini-fallback' ? modelId : 'openai/gpt-oss-120b:free',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 200,
+        }),
+      });
+      if (res.ok) { const d = await res.json(); raw = d.choices?.[0]?.message?.content || ''; }
+    } else if (user.geminiToken) {
+      const apiKey = process.env.GEMINI_API_KEY;
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
+        }
+      );
+      if (res.ok) { const d = await res.json(); raw = d.candidates?.[0]?.content?.parts?.[0]?.text || ''; }
+    }
+  } catch (e) {
+    console.error('Auto-learn model call failed:', e);
+    return;
+  }
+
+  const facts = parseFacts(raw);
+  if (!facts.length) return;
+
+  const existing = await Knowledge.find({ user: user._id });
+  const seen = existing.map(e => normalizeFact(e.content)).filter(Boolean);
+
+  for (const f of facts.slice(0, 5)) {
+    const content = (f.content || '').toString().trim();
+    if (!content) continue;
+    const norm = normalizeFact(content);
+    if (!norm) continue;
+    // Skip near-duplicates of anything already stored or added this run.
+    const dup = seen.some(e => e === norm || e.includes(norm) || norm.includes(e));
+    if (dup) continue;
+    seen.push(norm);
+    await Knowledge.create({
+      user: user._id,
+      title: (f.title || '').toString().trim(),
+      content,
+      source: 'ai',
+    });
+  }
+}
+
 export async function POST(request) {
   try {
     await connectToDatabase();
@@ -106,7 +194,24 @@ export async function POST(request) {
     const webSearchClause = webSearch
       ? ' WEB SEARCH IS ON: You have live internet access for this message. Use the search results to answer with current information, and you may mention that you searched the web when relevant.'
       : ' WEB SEARCH IS OFF: You do NOT have internet access for this message. Answer ONLY from your existing training knowledge. NEVER claim, state, or imply that you searched, browsed, looked up, or accessed the internet or any live/real-time source. If the user needs current or real-time information, tell them to enable web search using the globe icon.';
-    const systemPrompt = SYSTEM_PROMPT + webSearchClause;
+
+    // Self-learning context: inject the user's saved knowledge base so the AI
+    // "remembers" persistent facts across all chats.
+    let knowledgeClause = '';
+    try {
+      const entries = await Knowledge.find({ user: user._id });
+      if (entries.length > 0) {
+        const lines = entries
+          .slice(0, 40)
+          .map(k => `- ${k.title ? `${k.title}: ` : ''}${k.content}`)
+          .join('\n');
+        knowledgeClause = `\n\nKNOWLEDGE BASE — persistent facts you have learned about this user or their work. Treat these as true and use them when relevant:\n${lines}`;
+      }
+    } catch (e) {
+      console.error('Failed to load knowledge base:', e);
+    }
+
+    const systemPrompt = SYSTEM_PROMPT + webSearchClause + knowledgeClause;
 
     // Get the latest user message text
     const latestUserMessageText = contents[contents.length - 1]?.parts?.[0]?.text || '';
@@ -136,6 +241,10 @@ export async function POST(request) {
     } else {
       await Chat.update(chat._id, { messages: chat.messages });
     }
+
+    // Self-learning (fire-and-forget): capture durable facts about the user in
+    // the background so it never adds latency to the chat response.
+    learnFromMessage(user, latestUserMessageText, modelId).catch(err => console.error('Auto-learn failed:', err));
 
     // Reconstruct full chat history for the AI Context
     const fullHistory = chat.messages.map(msg => ({

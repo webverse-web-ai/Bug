@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, Platform, TouchableOpacity } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Markdown from 'react-native-markdown-display';
@@ -9,9 +9,23 @@ import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 export default function ChatMessage({ item, user }) {
   const { COLORS } = useTheme();
   const styles = getStyles(COLORS);
-  
+  const [copied, setCopied] = useState(false);
+
   const isModel = item.role === 'model';
-  
+
+  const handleCopy = async () => {
+    try {
+      if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(item.text || '');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }
+      // Native copy needs `expo-clipboard`; install it to enable copy on iOS/Android.
+    } catch (e) {
+      // Clipboard unavailable — ignore.
+    }
+  };
+
   if (isModel) {
     return (
       <Animated.View entering={FadeInUp.duration(350).springify().damping(18)} style={styles.messageRowModel}>
@@ -24,6 +38,16 @@ export default function ChatMessage({ item, user }) {
         <View style={styles.messageContentModel}>
           <Markdown style={styles.markdownStyles}>{item.text}</Markdown>
         </View>
+        <TouchableOpacity style={styles.copyButton} onPress={handleCopy} hitSlop={8} activeOpacity={0.7}>
+          <MaterialCommunityIcons
+            name={copied ? 'check' : 'content-copy'}
+            size={13}
+            color={copied ? (COLORS.success || '#4CAF50') : COLORS.onSurfaceVariant}
+          />
+          <Text style={[styles.copyText, copied && { color: COLORS.success || '#4CAF50' }]}>
+            {copied ? 'Copied' : 'Copy'}
+          </Text>
+        </TouchableOpacity>
       </Animated.View>
     );
   }
@@ -68,6 +92,8 @@ const getStyles = (COLORS) => StyleSheet.create({
     ...(Platform.OS === 'web' ? { wordBreak: 'break-word', overflowWrap: 'break-word' } : {})
   },
   modelHeaderName: { ...TYPOGRAPHY.labelSm, color: COLORS.primary, letterSpacing: 0.5 },
+  copyButton: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6, marginLeft: 2, paddingVertical: 2, alignSelf: 'flex-start' },
+  copyText: { ...TYPOGRAPHY.labelSm, color: COLORS.onSurfaceVariant },
   
   messageRowUser: { flexDirection: 'column', marginBottom: SPACING.lg, alignItems: 'flex-end', marginTop: SPACING.md },
   messageHeaderUser: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs, marginBottom: 4 },

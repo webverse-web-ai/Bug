@@ -136,6 +136,13 @@ export default function ChatInput({
             onChangeText={setInputText}
             onFocus={() => { setIsInputFocused(true); if (isModelSelectorOpen) toggleModelSelector(); }}
             onBlur={() => setIsInputFocused(false)}
+            onKeyPress={(e) => {
+              // Web: Enter sends, Shift+Enter inserts a newline.
+              if (Platform.OS === 'web' && e.nativeEvent.key === 'Enter' && !e.nativeEvent.shiftKey) {
+                e.preventDefault();
+                if (!loading && (inputText.trim() || attachments.length > 0)) handleSend();
+              }
+            }}
             multiline
             maxLength={2000}
           />

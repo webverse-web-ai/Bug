@@ -11,7 +11,8 @@ import {
   Image,
   Animated,
   ScrollView,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Dimensions
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Svg, { Defs, Pattern, Circle, Rect } from 'react-native-svg';
@@ -185,6 +186,7 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   
   const flatListRef = useRef(null);
+  const stickToBottomRef = useRef(true);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const dropdownAnim = useRef(new Animated.Value(0)).current;
 
@@ -248,25 +250,25 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
     }
   };
 
-  // Robust scroll-to-bottom: wait for the new content to lay out (two animation
-  // frames) before scrolling, with a timeout fallback for web.
+  // Always scroll to the very bottom — past the last message AND the thinking
+  // footer — so nothing is ever hidden. Retried across frames + a timeout for
+  // web reliability (scrollToEnd can fire before new content has laid out).
   const scrollToBottom = (animated = true) => {
+    stickToBottomRef.current = true;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         flatListRef.current?.scrollToEnd({ animated });
       });
     });
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated }), 150);
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated }), 120);
   };
 
+  // New / updated messages → follow to the bottom.
   useEffect(() => {
-    if (messages.length > 0 && !showScrollDown) {
-      scrollToBottom(true);
-    }
-  }, [messages, loading]);
+    scrollToBottom(true);
+  }, [messages]);
 
-  // When a response starts generating, always snap to the bottom so the
-  // thinking indicator is visible — even if the user had scrolled up.
+  // Thinking indicator appears (or response finishes) → keep the bottom in view.
   useEffect(() => {
     if (loading) {
       setShowScrollDown(false);
@@ -276,7 +278,10 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
 
   const handleScroll = (event) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 150;
+    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 120;
+    // Auto-follow only while near the bottom. If the user scrolls up to read
+    // history, stop following until they return to the bottom.
+    stickToBottomRef.current = isCloseToBottom;
     setShowScrollDown(!isCloseToBottom);
   };
 
@@ -412,8 +417,11 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           onContentSizeChange={() => {
-            // While generating, always follow the growing thinking steps to the bottom
-            if (loading || !showScrollDown) flatListRef.current?.scrollToEnd({ animated: false });
+            // Content grew (new message OR thinking steps appearing). Follow to
+            // the very bottom while sticking to bottom or while generating.
+            if (stickToBottomRef.current || loading) {
+              flatListRef.current?.scrollToEnd({ animated: false });
+            }
           }}
           onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
           onScrollBeginDrag={() => { if (isModelSelectorOpen) toggleModelSelector(); Keyboard.dismiss(); }}
@@ -424,7 +432,7 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
       {showScrollDown && (
         <TouchableOpacity
           style={styles.scrollDownButton}
-          onPress={() => flatListRef.current?.scrollToEnd({ animated: true })}
+          onPress={() => scrollToBottom(true)}
         >
           <MaterialCommunityIcons name="arrow-down-circle" size={32} color={COLORS.primary} style={{ opacity: 0.8 }} />
         </TouchableOpacity>
@@ -457,7 +465,7 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
 
 const getStyles = (COLORS) => StyleSheet.create({
   // Chat Area
-  chatContainer: { padding: SPACING.lg, paddingBottom: 200 },
+  chatContainer: { padding: SPACING.lg, paddingBottom: Dimensions.get('window').height * 0.8 },
   loadingHistory: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   container: { flex: 1, backgroundColor: COLORS.background, overflow: 'hidden' },
 

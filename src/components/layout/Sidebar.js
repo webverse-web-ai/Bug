@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 
@@ -193,7 +194,10 @@ export default function Sidebar({
         )}
 
         <View style={styles.bottomLinksContainer}>
-          <TouchableOpacity style={styles.drawerLink}>
+          <TouchableOpacity
+            style={styles.drawerLink}
+            onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/knowledge'); }}
+          >
             <MaterialCommunityIcons name="database" size={20} color={COLORS.onSurfaceVariant} />
             <Text style={styles.drawerLinkText}>Knowledge Base</Text>
           </TouchableOpacity>
