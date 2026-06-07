@@ -27,9 +27,18 @@ export async function GET(request) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    let chat = await Chat.findOne({ user: user._id });
+    const url = new URL(request.url);
+    const sessionId = url.searchParams.get('sessionId');
+
+    let chat;
+    if (sessionId) {
+      chat = await Chat.findOne({ _id: sessionId, user: user._id });
+    } else {
+      // For backward compatibility, fetch the latest or simply return empty
+      // Actually if no sessionId is passed, it means we are in "New Chat" state before first message.
+      return Response.json({ messages: [] }, { status: 200 });
+    }
     
-    // If no chat history exists, return empty array. We will create the doc when they send a message.
     if (!chat) {
       return Response.json({ messages: [] }, { status: 200 });
     }

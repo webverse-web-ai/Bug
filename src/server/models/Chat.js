@@ -8,7 +8,7 @@ const messageSchema = new mongoose.Schema({
   },
   text: {
     type: String,
-    required: true
+    default: ''
   },
   attachments: [{
     type: String // base64 or URL
@@ -19,8 +19,11 @@ const chatSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-    unique: true // One main memory chat per user for now
+    required: true
+  },
+  title: {
+    type: String,
+    default: 'New Chat'
   },
   messages: [messageSchema]
 }, { timestamps: true });

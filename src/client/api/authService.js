@@ -19,17 +19,20 @@ const getApiUrl = () => {
 
 const API_BASE_URL = getApiUrl() + '/api/auth';
 
-const getHeaders = async () => {
-  let token = null;
+export const getToken = async () => {
   try {
     if (Platform.OS === 'web') {
-      token = localStorage.getItem('jwt_token');
-    } else {
-      token = await SecureStore.getItemAsync('jwt_token');
+      return localStorage.getItem('jwt_token');
     }
+    return await SecureStore.getItemAsync('jwt_token');
   } catch (e) {
     console.warn("Could not get token:", e);
+    return null;
   }
+};
+
+const getHeaders = async () => {
+  const token = await getToken();
 
   return {
     'Content-Type': 'application/json',

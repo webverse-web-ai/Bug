@@ -25,6 +25,12 @@ async function connectToDatabase() {
   if (!cached.promise || mongoose.connection.readyState !== 1) {
     const opts = {
       bufferCommands: false,
+      // M0 free tier caps at 500 connections. Keep the pool small so dev
+      // hot-reloads / multiple instances don't exhaust the limit.
+      maxPoolSize: 10,
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
