@@ -1,0 +1,433 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bug - Settings &amp; Integrations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#dee3e9",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "surface-container-highest": "#30353a",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container-high": "#252b2f",
+                    "on-tertiary-fixed": "#2c1600",
+                    "surface-variant": "#30353a",
+                    "surface-container-lowest": "#0a0f13",
+                    "primary-container": "#0ea5e9",
+                    "tertiary-fixed-dim": "#ffb86e",
+                    "primary-fixed-dim": "#89ceff",
+                    "tertiary-container": "#de8712",
+                    "inverse-on-surface": "#2c3135",
+                    "primary": "#89ceff",
+                    "on-error": "#690005",
+                    "on-primary": "#00344d",
+                    "surface": "#0f1418",
+                    "surface-container": "#1b2024",
+                    "on-error-container": "#ffdad6",
+                    "tertiary": "#ffb86e",
+                    "surface-bright": "#353a3e",
+                    "on-secondary": "#213145",
+                    "background": "#0f1418",
+                    "primary-fixed": "#c9e6ff",
+                    "secondary": "#b7c8e1",
+                    "on-secondary-container": "#a9bad3",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-background": "#dee3e9",
+                    "on-surface-variant": "#bec8d2",
+                    "surface-tint": "#89ceff",
+                    "on-tertiary": "#492900",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#ffdcbd",
+                    "outline-variant": "#3e4850",
+                    "surface-container-low": "#171c20",
+                    "on-tertiary-container": "#4d2b00",
+                    "outline": "#88929b",
+                    "on-surface": "#dee3e9",
+                    "on-primary-fixed": "#001e2f",
+                    "on-secondary-fixed": "#0b1c30",
+                    "on-primary-container": "#003751",
+                    "error": "#ffb4ab",
+                    "secondary-container": "#3a4a5f",
+                    "on-tertiary-fixed-variant": "#693c00",
+                    "inverse-primary": "#006591",
+                    "on-primary-fixed-variant": "#004c6e",
+                    "surface-dim": "#0f1418"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "base": "4px",
+                    "margin-desktop": "32px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "xl": "40px",
+                    "margin-mobile": "16px",
+                    "max-width": "1440px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["JetBrains Mono"],
+                    "label-md": ["JetBrains Mono"],
+                    "display": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                    "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f1418; }
+        ::-webkit-scrollbar-thumb { background: #3e4850; border-radius: 10px; }
+        .tab-active { border-bottom: 2px solid #89ceff; color: #89ceff; }
+        .glass-card { background: rgba(27, 32, 36, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(62, 72, 80, 0.5); }
+        
+        /* Sidebar Overlay Styles */
+        #sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar-backdrop {
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        #sidebar-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- Overlay Backdrop -->
+<div class="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 opacity-0 transition-opacity duration-300" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+<!-- NavigationDrawer (Overlay) -->
+<aside class="flex flex-col h-screen fixed left-0 top-0 z-50 w-64 border-r border-outline-variant bg-surface-container dark:bg-surface-container -translate-x-full" id="sidebar">
+<div class="p-md mb-lg flex items-center justify-between">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu9avG8hvQPYLk8v8XRfXPWjrBDWUSoBBYsp-t4h3xLXgHV-UEjbpavfpYXtjdfnyp3VAmc_vU17TfLTh3403yTR2ppsh85gVt9WDTDJcilOJv4XbLIQEiXxlblu5np0ZO_QxAKNFhd33RigLNcFVoQkBcFmYzsEuoDpYu_ZAc8_qOM9bZxc-MGfpEcvRxNGvaUNsE4jJ40oNYKbDhfV-vbGB_st6qXBU3CyzL5-pnWxteftSjIcMAR0iXuia3fNyDIyaIuSaHTA0" alt="Bug Logo" class="h-8 w-auto object-contain">
+<button class="material-symbols-outlined text-on-surface-variant md:hidden" data-icon="close" onclick="toggleSidebar()">close</button>
+</div>
+<nav class="flex-1 px-sm space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="">Pulse</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="">Tally</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="">Team Chat</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="">Marshal Chat</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-bold rounded-lg duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="">Agents Hub</span>
+</a>
+</nav>
+<div class="p-md mt-auto border-t border-outline-variant">
+<div class="flex items-center gap-md mb-sm">
+<img alt="Alex Morgan" class="w-10 h-10 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgiBBTGY8-vp6bYI4H5KJ9cPpgL5bAQyCbUPNKFpXYsmn19jlkXrw88iJa4IMdtKbSe9BD-CqoWYRF56Fr3NkFnAwLcjYp6eHxgASbTcZBFwjF40ZodMfMJ5A5x9tszP2dZzkWVvUQmbOxIo3lNUeDDrxNLG5fti5gxvz0htpGMl59D0EnAZNlH612z3uP5CZ3i2vjbEUzrEZC88JwZPKgSUyl_5SOibOxgxGngnTbxt-cAVKHIwF14Gz9KKBCqo--XHP8lMhBfwo">
+<div>
+<p class="font-body-md font-bold text-on-surface">Alex Morgan</p>
+<p class="text-label-sm text-on-surface-variant">Operations Lead</p>
+</div>
+</div>
+<button class="w-full text-left text-label-md text-on-surface-variant hover:text-primary transition-colors py-xs">
+            Settings &amp; Logout
+        </button>
+</div>
+</aside>
+<!-- Main Wrapper -->
+<div class="flex flex-col min-h-screen w-full">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-md w-full h-16 border-b border-outline-variant bg-surface dark:bg-surface sticky top-0 z-30">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface cursor-pointer p-sm -ml-sm hover:bg-surface-container rounded-full transition-colors" data-icon="menu" onclick="toggleSidebar()">menu</span>
+<h1 class="font-headline-md text-headline-md text-on-surface">Settings</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary cursor-pointer scale-95 transition-transform" data-icon="dark_mode">dark_mode</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="p-lg flex-1">
+<div class="max-w-[1200px] mx-auto">
+<!-- Tabs Navigation -->
+<div class="flex gap-lg border-b border-outline-variant mb-xl">
+<button class="pb-md font-label-md text-label-md tab-active transition-all" id="tab-profile" onclick="switchTab('profile')">
+                    Profile &amp; Theme
+                </button>
+<button class="pb-md font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" id="tab-llm" onclick="switchTab('llm')">
+                    LLM Integrations
+                </button>
+</div>
+<!-- Profile & Theme Section -->
+<section class="space-y-lg" id="section-profile">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Profile Card -->
+<div class="md:col-span-7 glass-card p-lg rounded-xl">
+<h3 class="font-headline-md text-headline-md mb-md">Personal Profile</h3>
+<div class="space-y-md">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="text-label-md text-on-surface-variant">Full Name</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-primary outline-none transition-all" type="text" value="Alex Morgan">
+</div>
+<div class="space-y-xs">
+<label class="text-label-md text-on-surface-variant">Role</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-primary outline-none transition-all" type="text" value="Operations Lead">
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-md text-on-surface-variant">Email Address</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm focus:ring-2 focus:ring-primary outline-none transition-all" type="email" value="alex.m@bug-ops.com">
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md hover:bg-primary-container transition-colors">
+                                Update Profile
+                            </button>
+</div>
+</div>
+<!-- Theme Card -->
+<div class="md:col-span-5 glass-card p-lg rounded-xl">
+<h3 class="font-headline-md text-headline-md mb-md">Visual Identity</h3>
+<div class="space-y-md">
+<div class="space-y-xs">
+<label class="text-label-md text-on-surface-variant">Primary Accent</label>
+<div class="flex items-center gap-md p-md bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="w-12 h-12 rounded-full bg-primary shadow-lg border-2 border-on-surface/10 cursor-pointer hover:scale-105 transition-transform"></div>
+<div class="flex-1">
+<p class="text-body-sm font-medium">Sky Blue (Default)</p>
+<p class="text-label-sm text-on-surface-variant font-mono">#89CEFF</p>
+</div>
+<input class="opacity-0 absolute w-0 h-0" type="color" value="#89ceff">
+<button class="material-symbols-outlined text-on-surface-variant" data-icon="colorize">colorize</button>
+</div>
+</div>
+<div class="space-y-xs pt-sm">
+<label class="text-label-md text-on-surface-variant">System Density</label>
+<div class="flex gap-sm">
+<div class="flex-1 p-sm border border-primary bg-primary/10 rounded-lg text-center cursor-pointer">
+<span class="text-label-sm font-bold">COMPACT</span>
+</div>
+<div class="flex-1 p-sm border border-outline-variant hover:border-on-surface-variant rounded-lg text-center cursor-pointer transition-colors">
+<span class="text-label-sm">RELAXED</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Security Overview -->
+<div class="glass-card p-lg rounded-xl border-l-4 border-primary">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="verified_user">verified_user</span>
+<div>
+<h4 class="font-headline-md text-headline-md">Security Snapshot</h4>
+<p class="text-body-md text-on-surface-variant mt-xs">Two-factor authentication is active. Last password update was 12 days ago from a recognized device in San Francisco.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- LLM Integrations Section -->
+<section class="hidden space-y-lg" id="section-llm">
+<div class="grid grid-cols-1 gap-md">
+<!-- Google Gemini -->
+<div class="glass-card p-lg rounded-xl flex items-center justify-between group hover:border-primary/50 transition-colors">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 bg-[#1A73E8]/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[#1A73E8]" data-icon="google" style="font-variation-settings: 'FILL' 1;">google</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md">Google Gemini</h4>
+<p class="text-body-sm text-on-surface-variant">Connect your workspace to leverage Pro and Ultra models.</p>
+</div>
+</div>
+<button class="flex items-center gap-sm bg-surface-container-high border border-outline-variant px-lg py-sm rounded-lg font-label-md hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="link">link</span>
+                            Connect via OAuth
+                        </button>
+</div>
+<!-- OpenAI -->
+<div class="glass-card p-lg rounded-xl border border-outline-variant">
+<div class="flex items-center gap-lg mb-lg">
+<div class="w-12 h-12 bg-[#10a37f]/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[#10a37f]" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md">OpenAI (GPT-4)</h4>
+<p class="text-body-sm text-on-surface-variant">Use your custom API key for full control over rate limits and costs.</p>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-md text-on-surface-variant">API Key</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm pr-12 focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="sk-••••••••••••••••••••••••••••••••" type="password">
+<button class="absolute right-4 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-sm" data-icon="visibility">visibility</span>
+</button>
+</div>
+<div class="flex justify-between items-center mt-sm">
+<span class="text-label-sm text-emerald-400 flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    Key verified: Ready to use
+                                </span>
+<button class="text-label-md text-primary hover:underline">Update Key</button>
+</div>
+</div>
+</div>
+<!-- Anthropic -->
+<div class="glass-card p-lg rounded-xl border border-outline-variant">
+<div class="flex items-center gap-lg mb-lg">
+<div class="w-12 h-12 bg-tertiary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md">Anthropic Claude</h4>
+<p class="text-body-sm text-on-surface-variant">Integrate Claude 3.5 Sonnet or Opus for complex reasoning tasks.</p>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-md text-on-surface-variant">Claude API Key</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm pr-12 focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="sk-ant-••••••••••••••••••••••••" type="password">
+<button class="absolute right-4 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-sm" data-icon="visibility">visibility</span>
+</button>
+</div>
+<div class="mt-sm flex items-center justify-between">
+<p class="text-label-sm text-on-surface-variant">Key is encrypted and stored in hardware security module (HSM).</p>
+<button class="bg-primary/10 text-primary border border-primary/20 px-lg py-sm rounded-lg font-label-md hover:bg-primary/20 transition-all">
+                                    Save Anthropic Key
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Integration Status Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mt-xl">
+<div class="p-md bg-surface-container rounded-lg border border-outline-variant text-center">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Active Requests</p>
+<p class="text-headline-md font-bold text-primary mt-sm">1,204</p>
+</div>
+<div class="p-md bg-surface-container rounded-lg border border-outline-variant text-center">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Avg. Latency</p>
+<p class="text-headline-md font-bold text-tertiary mt-sm">480ms</p>
+</div>
+<div class="p-md bg-surface-container rounded-lg border border-outline-variant text-center">
+<p class="text-label-sm text-on-surface-variant uppercase tracking-widest">Error Rate</p>
+<p class="text-headline-md font-bold text-error mt-sm">0.02%</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- BottomNavBar as FAB -->
+<div class="fixed bottom-8 right-8 z-50 flex flex-col gap-sm">
+<button class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full w-14 h-14 shadow-xl flex items-center justify-center hover:scale-110 transition-transform animate-pulse">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</button>
+<button class="bg-surface-container-highest text-on-surface rounded-full w-14 h-14 shadow-xl flex items-center justify-center hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    let isSidebarOpen = false;
+
+    function toggleSidebar() {
+        isSidebarOpen = !isSidebarOpen;
+        if (isSidebarOpen) {
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.add('active');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.remove('active');
+        }
+    }
+
+    function switchTab(tab) {
+        const profileTab = document.getElementById('tab-profile');
+        const llmTab = document.getElementById('tab-llm');
+        const profileSec = document.getElementById('section-profile');
+        const llmSec = document.getElementById('section-llm');
+
+        if (tab === 'profile') {
+            profileTab.classList.add('tab-active');
+            profileTab.classList.remove('text-on-surface-variant');
+            llmTab.classList.remove('tab-active');
+            llmTab.classList.add('text-on-surface-variant');
+            profileSec.classList.remove('hidden');
+            llmSec.classList.add('hidden');
+        } else {
+            llmTab.classList.add('tab-active');
+            llmTab.classList.remove('text-on-surface-variant');
+            profileTab.classList.remove('tab-active');
+            profileTab.classList.add('text-on-surface-variant');
+            llmSec.classList.remove('hidden');
+            profileSec.classList.add('hidden');
+        }
+    }
+
+    // Input masking for passwords
+    document.querySelectorAll('input[type="password"]').forEach(input => {
+        const toggle = input.nextElementSibling;
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                const icon = toggle.querySelector('span');
+                icon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+            });
+        }
+    });
+
+    // Close sidebar on window resize if open
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024 && isSidebarOpen) {
+            toggleSidebar();
+        }
+    });
+</script>
+
+
+</body></html>

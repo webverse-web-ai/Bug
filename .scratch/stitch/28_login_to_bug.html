@@ -1,0 +1,253 @@
+<!DOCTYPE html><html class="dark" lang="en" style="width: 390px; height: 857px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Login | Bug AI Cognitive OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(27, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(62, 72, 80, 0.5);
+        }
+        .auth-input:focus {
+            box-shadow: 0 0 0 2px rgba(137, 206, 255, 0.2);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#252b2f",
+                      "on-error-container": "#ffdad6",
+                      "background": "#0f1418",
+                      "primary-fixed": "#c9e6ff",
+                      "on-error": "#690005",
+                      "error": "#ffb4ab",
+                      "secondary": "#b7c8e1",
+                      "on-primary-fixed": "#001e2f",
+                      "surface-container-highest": "#30353a",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "surface-dim": "#0f1418",
+                      "surface-container": "#1b2024",
+                      "on-background": "#dee3e9",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "inverse-surface": "#dee3e9",
+                      "on-secondary-container": "#a9bad3",
+                      "error-container": "#93000a",
+                      "primary-fixed-dim": "#89ceff",
+                      "primary": "#89ceff",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container-lowest": "#0a0f13",
+                      "on-surface": "#dee3e9",
+                      "on-secondary": "#213145",
+                      "surface-bright": "#353a3e",
+                      "primary-container": "#0ea5e9",
+                      "tertiary-fixed-dim": "#ffb86e",
+                      "tertiary": "#ffb86e",
+                      "outline": "#88929b",
+                      "on-surface-variant": "#bec8d2",
+                      "on-secondary-fixed": "#0b1c30",
+                      "tertiary-container": "#de8712",
+                      "on-tertiary-fixed": "#2c1600",
+                      "on-primary-fixed-variant": "#004c6e",
+                      "on-tertiary-container": "#4d2b00",
+                      "on-tertiary": "#492900",
+                      "on-primary": "#00344d",
+                      "surface-variant": "#30353a",
+                      "secondary-container": "#3a4a5f",
+                      "on-primary-container": "#003751",
+                      "surface-tint": "#89ceff",
+                      "surface-container-low": "#171c20",
+                      "inverse-primary": "#006591",
+                      "tertiary-fixed": "#ffdcbd",
+                      "inverse-on-surface": "#2c3135",
+                      "surface": "#0f1418",
+                      "on-tertiary-fixed-variant": "#693c00",
+                      "outline-variant": "#3e4850"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "gutter": "16px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "max-width": "1440px",
+                      "margin-desktop": "32px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "label-md": ["JetBrains Mono"],
+                      "headline-lg": ["Inter"],
+                      "display": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "label-sm": ["JetBrains Mono"],
+                      "body-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col selection:bg-primary selection:text-on-primary-fixed overflow-x-hidden">
+<!-- Top AppBar (Simplified for Login) -->
+<header class="w-full top-0 z-50 flex items-center justify-between px-md py-sm max-w-max-width mx-auto bg-background">
+<div class="flex items-center gap-sm">
+
+
+</div>
+<div class="hidden md:flex gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high px-sm py-xs rounded transition-colors duration-200" href="#">System Status</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high px-sm py-xs rounded transition-colors duration-200" href="#">Documentation</a>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-xl relative">
+<!-- Atmospheric Background Element -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="w-full max-w-[440px] z-10">
+<!-- Brand Header -->
+<div class="text-center mb-xl">
+<img alt="Bug Logo" class="w-20 h-20 mx-auto mb-md rounded-xl shadow-2xl shadow-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9w8tDsDz1LQs6FEqMo1SHZK1CNTtQYZHlIZftu9oP8KxL8MCufap5UR0Nfdzblton78TwrLlB_0NlRL_hA80Dz3ELyD-F4YV0qAev4-ZmhX-KG-cxUJgL1bgTGmDymgUbB44HW6jLQQOr6erSvFstMCur2rkbYLKOkKGcYDmeIAty7ewPDieqtLkfNAWQ-JeDhw0F7nasSBNMQQsvP-BKED6mm8l6d8okThRQ0akRyLwvYpS3VUgEthdPq52Fid6r8TqK7uwgTP8">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">Welcome to Bug</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Your AI-native Business OS</p>
+</div>
+<!-- Login Container -->
+<div class="glass-panel p-md md:p-lg rounded-xl shadow-xl">
+<form class="flex flex-col gap-md" id="loginForm">
+<!-- Segmented Control -->
+<div class="bg-surface-container-lowest p-xs rounded-lg flex items-center border border-outline-variant">
+<button class="flex-1 py-sm px-md font-label-md text-label-md rounded transition-all duration-200 bg-primary-container text-on-primary-container" id="btn-solo" onclick="setMode('solo')" type="button">
+                            Solo
+                        </button>
+<button class="flex-1 py-sm px-md font-label-md text-label-md rounded transition-all duration-200 text-on-surface-variant hover:bg-surface-container-high" id="btn-team" onclick="setMode('team')" type="button">
+                            Team
+                        </button>
+</div>
+<!-- Input Fields -->
+<div class="flex flex-col gap-sm">
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="email">Email Address</label>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg px-md py-sm font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary auth-input transition-all duration-200" id="email" placeholder="name@company.com" required="" type="email">
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="password">Password</label>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">Forgot Password?</a>
+</div>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg px-md py-sm font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary auth-input transition-all duration-200" id="password" placeholder="••••••••" required="" type="password">
+</div>
+</div>
+<!-- Contextual Team Section (Initially Hidden via opacity logic if needed, but here as a toggleable block) -->
+<div class="hidden animate-in fade-in slide-in-from-top-2 duration-300" id="team-context">
+<div class="space-y-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="team-id">Workspace ID</label>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg px-md py-sm font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary auth-input transition-all duration-200" id="team-id" placeholder="acme-corp-global" type="text">
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-on-primary-container font-label-md text-headline-md py-sm rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-sm" type="submit">
+                        Sign In
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Links within Card -->
+<div class="flex items-center gap-md my-md">
+    <div class="flex-grow h-px bg-outline-variant"></div>
+    <span class="font-label-sm text-label-sm text-outline uppercase tracking-widest">or</span>
+    <div class="flex-grow h-px bg-outline-variant"></div>
+</div>
+
+<div class="flex flex-col gap-sm">
+    <button class="w-full flex items-center justify-center gap-md px-md py-sm bg-surface-container border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors duration-200 group"><svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg><span class="font-label-md text-label-md text-on-surface">Continue with Google</span></button>
+
+    <button class="w-full flex items-center justify-center gap-md px-md py-sm bg-surface-container border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors duration-200 group"><svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg><span class="font-label-md text-label-md text-on-surface">Continue with Facebook</span></button>
+</div><div class="mt-lg pt-md border-t border-outline-variant flex flex-col items-center gap-sm">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Don't have an account?</p>
+
+</div>
+</div>
+<!-- Alternative Section: Invite/Join -->
+<div class="mt-lg text-center">
+<a class="group flex items-center justify-center gap-xs font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="group_add">group_add</span>
+                    Join an existing team instead
+                    <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+</div>
+</main>
+<!-- Footer Component -->
+
+<script>
+        function setMode(mode) {
+            const soloBtn = document.getElementById('btn-solo');
+            const teamBtn = document.getElementById('btn-team');
+            const teamContext = document.getElementById('team-context');
+
+            if (mode === 'solo') {
+                soloBtn.classList.add('bg-primary-container', 'text-on-primary-container');
+                soloBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+                
+                teamBtn.classList.remove('bg-primary-container', 'text-on-primary-container');
+                teamBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+                
+                teamContext.classList.add('hidden');
+            } else {
+                teamBtn.classList.add('bg-primary-container', 'text-on-primary-container');
+                teamBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+                
+                soloBtn.classList.remove('bg-primary-container', 'text-on-primary-container');
+                soloBtn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+                
+                teamContext.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            // Micro-interaction: Loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" data-icon="progress_activity">progress_activity</span> Authenticating...';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                alert('In a real application, this would authenticate against the Bug AI Cognitive OS backend.');
+            }, 1500);
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bug BOS - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary-fixed-variant": "#38485d",
+                "surface-container-lowest": "#0a0f13",
+                "surface": "#0f1418",
+                "secondary-container": "#3a4a5f",
+                "on-primary-fixed": "#001e2f",
+                "primary-container": "#0ea5e9",
+                "surface-container-low": "#171c20",
+                "on-secondary": "#213145",
+                "surface-container": "#1b2024",
+                "on-secondary-fixed": "#0b1c30",
+                "error-container": "#93000a",
+                "surface-container-high": "#252b2f",
+                "on-surface-variant": "#bec8d2",
+                "on-tertiary-fixed-variant": "#693c00",
+                "primary": "#89ceff",
+                "on-secondary-container": "#a9bad3",
+                "tertiary-fixed-dim": "#ffb86e",
+                "outline": "#88929b",
+                "outline-variant": "#3e4850",
+                "inverse-surface": "#dee3e9",
+                "on-tertiary": "#492900",
+                "surface-container-highest": "#30353a",
+                "surface-tint": "#89ceff",
+                "inverse-primary": "#006591",
+                "surface-bright": "#353a3e",
+                "error": "#ffb4ab",
+                "surface-dim": "#0f1418",
+                "secondary-fixed": "#d3e4fe",
+                "on-tertiary-fixed": "#2c1600",
+                "on-error": "#690005",
+                "on-background": "#dee3e9",
+                "primary-fixed-dim": "#89ceff",
+                "surface-variant": "#30353a",
+                "secondary-fixed-dim": "#b7c8e1",
+                "on-tertiary-container": "#4d2b00",
+                "tertiary-container": "#de8712",
+                "on-primary": "#00344d",
+                "secondary": "#b7c8e1",
+                "tertiary": "#ffb86e",
+                "primary-fixed": "#c9e6ff",
+                "on-primary-container": "#003751",
+                "inverse-on-surface": "#2c3135",
+                "on-surface": "#dee3e9",
+                "background": "#0f1418",
+                "on-primary-fixed-variant": "#004c6e",
+                "on-error-container": "#ffdad6",
+                "tertiary-fixed": "#ffdcbd"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "margin-mobile": "16px",
+                "margin-desktop": "32px",
+                "xl": "40px",
+                "lg": "24px",
+                "sm": "8px",
+                "max-width": "1440px",
+                "gutter": "16px",
+                "xs": "4px",
+                "base": "4px",
+                "md": "16px"
+            },
+            "fontFamily": {
+                "label-sm": ["JetBrains Mono"],
+                "headline-lg": ["Inter"],
+                "body-sm": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-lg-mobile": ["Inter"],
+                "label-md": ["JetBrains Mono"],
+                "body-lg": ["Inter"],
+                "headline-md": ["Inter"],
+                "display": ["Inter"]
+            },
+            "fontSize": {
+                "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        .pulse-bar {
+            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ai-glow {
+            box-shadow: 0 0 20px -5px rgba(137, 206, 255, 0.3);
+        }
+        .glass-card {
+            background: rgba(23, 28, 32, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(136, 146, 155, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3e4850;
+            border-radius: 10px;
+        }
+        #nav-overlay {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #nav-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            display: flex !important;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-50 bg-surface border-b border-outline-variant flex items-center justify-between px-md h-16">
+<div class="flex items-center gap-md">
+<button class="cursor-pointer active:scale-95 hover:bg-surface-container-high transition-colors p-2 rounded-full" onclick="toggleNav()">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<div class="flex items-center gap-sm">
+<img alt="Bug Logo" class="w-8 h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9XHmSyhp3yNZz8yk7B1V-bhVrlWQNXY5xWKNcJ69mp24MSHSWOPKO1LMqTxy3TWUIVqdVvkgNHdQ3S-U0OwA_QbOiJkotzguwZ_5INKiXFB1F8b-3g0jBeSM0EYOTBmXcb2pPjb18wJhDfGaa3rZRquYrG0jIamz8k7FN1PEgyaWwDTwaSwFq5Vx12YkRZSf0ykkHffF2I7EKSE91gr3gj0gIGyV9AjGZUXRzQw4-fJ83yQkZrE5hUtoRT_dj0IezXBMs8CBdlvI">
+<span class="font-display text-headline-md text-primary tracking-tighter">Bug BOS</span>
+</div>
+</div>
+<div class="hidden md:flex flex-1 max-w-2xl px-lg">
+<div class="w-full relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 px-12 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md transition-all" placeholder="Command Bug agent..." type="text">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary">auto_awesome</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden sm:flex flex-col items-end">
+<span class="font-label-md text-label-md text-on-surface">System Core</span>
+<span class="font-label-sm text-label-sm text-primary">98.4% Efficiency</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center border border-outline-variant overflow-hidden cursor-pointer active:scale-95">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDad5qzDFKo0vyxgTuorR3ZaRwOnAeQE30GTicUnWXqqRLW2EoVTUKLfRdw_4ShU85-HxOnEDI9iRwo02vT1UdVxCB5WwJe1qqMKfpBLe0bje7Eqi6xNHY-PwQZl5Y8Tdo9Q2m9QtZUMqOYuIGpEfHubM3T3fEchK5hOSgbpxot82s34-I_Q8A0lUxB1rn_il2dW6g8qL929W9OKRQD2vtzQ7XBRimGlwoPYK2MmCQ54_QcxD2WDvE5GcO96SVyXBP8OxZ8Ea9M8qk">
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-[1440px] mx-auto p-md md:p-lg lg:p-xl space-y-lg">
+<!-- Welcome Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+<div>
+<h1 class="font-display text-display text-on-surface">Good Morning, Alex</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">Bug is running optimally. 4 critical insights ready for your review in Marketing-Alpha.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container-high border border-outline-variant text-on-surface px-md py-sm rounded-lg flex items-center gap-xs font-label-md hover:bg-surface-container-highest transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Create New Sub-Agent
+                </button>
+<button class="bg-primary text-on-primary-container px-md py-sm rounded-lg flex items-center gap-xs font-label-md hover:opacity-90 transition-all active:scale-95 ai-glow">
+<span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+                    Deploy Protocol
+                </button>
+</div>
+</section>
+<!-- Bento Dashboard -->
+<div class="bento-grid">
+<!-- Perplexity Style Search Box (Mobile/Tablet centric view) -->
+<div class="col-span-12 md:hidden">
+<div class="glass-card rounded-xl p-md flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body-md text-on-surface placeholder:text-on-surface-variant" placeholder="Ask Bug anything..." type="text">
+</div>
+</div>
+<!-- AI Summary Card -->
+<div class="col-span-12 lg:col-span-7 glass-card rounded-xl p-lg space-y-md border-l-4 border-l-primary relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h2 class="font-headline-md text-headline-md">AI Insights: Marketing-Alpha</h2>
+</div>
+<span class="font-label-sm text-label-sm bg-primary-container/20 text-primary px-2 py-0.5 rounded">Live Analysis</span>
+</div>
+<div class="space-y-sm">
+<p class="text-on-surface-variant font-body-md leading-relaxed">
+                        Campaign <span class="text-primary font-bold">Alpha-Vector</span> is showing a 22% increase in engagement. Bug suggests reallocating 15% of the Beta budget to capitalize on the weekend surge. Competitive sentiment in the tech-node sector has shifted neutral, providing an entry window.
+                    </p>
+<div class="flex flex-wrap gap-sm pt-sm">
+<div class="bg-surface-container-highest px-3 py-1 rounded-full text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +22% Yield
+                        </div>
+<div class="bg-surface-container-highest px-3 py-1 rounded-full text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">history</span> 2m ago
+                        </div>
+<div class="bg-surface-container-highest px-3 py-1 rounded-full text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">hub</span> 6 Node Connections
+                        </div>
+</div>
+</div>
+<div class="absolute -right-8 -bottom-8 opacity-5">
+<img alt="Bug Decor" class="w-48 h-48 rotate-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUoeDs5egY22Q4pdDaQua6A6DBGH9yJOi4N6B6qCCAKbb1Ao2fK11HEJ0jDT1vAKOReWv3AxN1QEkDij8qzdKpn967CyRcDmezKol_sSJKlMAGpimtkhm9MYw9AHISh4S5nWtfNK4HclQBxd8dOfgkSIrRGYUf0TBahR-i6MZWf-B0rwyYZhTViqK5AOgX8WWQZRCoD8Xfay-wLAS1fXGXpzxOoeWydMtdYBI6cs4aL-jdNovXi7zvjNliWKT__uuIwT5_-fV5Mls">
+</div>
+</div>
+<!-- Efficiency Pulse Bar Chart -->
+<div class="col-span-12 lg:col-span-5 glass-card rounded-xl p-lg flex flex-col justify-between overflow-hidden">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<h3 class="font-headline-md text-headline-md">Efficiency Pulse</h3>
+<p class="text-on-surface-variant text-label-md">Global Operation Output</p>
+</div>
+<div class="text-right">
+<span class="text-primary font-display text-headline-lg">98.4%</span>
+</div>
+</div>
+<div class="flex items-end justify-between h-32 gap-2">
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 34.8211%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 54.0306%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 56.9904%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 81.6989%;"></div>
+<div class="pulse-bar bg-primary w-full rounded-t-sm" style="height: 100%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 74.5207%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 42.219%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 58.6468%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 55.7947%;"></div>
+<div class="pulse-bar bg-outline-variant w-full rounded-t-sm" style="height: 84.5475%;"></div>
+</div>
+</div>
+<!-- Operational Sub-Nodes -->
+<div class="col-span-12 md:col-span-4 glass-card rounded-xl p-md group cursor-pointer hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">monitoring</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-on-surface">Data Pulse</h4>
+<p class="text-label-sm text-on-surface-variant">Active Monitoring</p>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-4 glass-card rounded-xl p-md group cursor-pointer hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">account_balance</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-on-surface">Capital Tally</h4>
+<p class="text-label-sm text-on-surface-variant">Asset Distribution</p>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-4 glass-card rounded-xl p-md group cursor-pointer hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary">hub</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-on-surface">Agent Hub</h4>
+<p class="text-label-sm text-on-surface-variant">14 Sub-Agents Online</p>
+</div>
+</div>
+</div>
+<!-- System Visual (Asymmetric Large Card) -->
+<div class="col-span-12 glass-card rounded-xl h-[400px] overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+<div class="p-lg relative z-10 flex flex-col h-full justify-between">
+<div>
+<h3 class="font-display text-headline-lg">Active Mesh Network</h3>
+<p class="text-on-surface-variant">Global deployment visualization for current operative protocols.</p>
+</div>
+<div class="flex gap-md mb-lg">
+<div class="bg-surface-container-highest p-4 rounded-xl border border-outline-variant flex-1">
+<span class="block text-label-sm text-primary uppercase tracking-widest mb-1">Inbound Traffic</span>
+<span class="text-headline-md font-mono">14.8 GB/s</span>
+</div>
+<div class="bg-surface-container-highest p-4 rounded-xl border border-outline-variant flex-1">
+<span class="block text-label-sm text-primary uppercase tracking-widest mb-1">Latency</span>
+<span class="text-headline-md font-mono">12ms</span>
+</div>
+</div>
+</div>
+<!-- Visual Map Component -->
+<div class="absolute right-0 top-0 bottom-0 w-1/2 hidden md:block opacity-40">
+<img class="w-full h-full object-cover" data-alt="A futuristic digital data map of the world visualized with glowing lines and neural network points. The aesthetic is tech-noir with deep charcoal backgrounds and vibrant electric blue glowing connections. The composition is clean and technical, showing data flow across continents in a minimalist, high-fidelity UI style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6Xs6LJJoUJnKoP1ID1hOw0DnTeqglH4bmrRmH5NlflQmf1JEMPSZfZkgTbCOopGxklc-0bqaJZg0zhhmeFeoe5OJ7lHplaCZEwVEn1mpcDJTOlzX8ZEczce4UrTpXlHNIi_H7D-h01NnbIjALqciEoGtr-5CgLLvZp6esribrMf7Yq0DjBJm7liODbISizv5G6h1lB5vzOq62PFdVZVX7tGDHPfA1H1rl5kCsyJFiAOKQDSsWYdmS-yu8whAKkoJ1T8sRmTm3vbw">
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Drawer Overlay -->
+<div class="fixed inset-0 bg-background/80 backdrop-blur-sm z-[60] hidden flex-col" id="nav-overlay">
+<div class="h-full w-64 bg-surface-container shadow-sm flex flex-col gap-base p-md border-r border-outline-variant animate-in slide-in-from-left duration-200">
+<div class="flex items-center justify-between mb-lg px-2">
+<span class="font-display text-headline-md text-primary">Bug BOS</span>
+<button class="text-on-surface-variant hover:text-on-surface" onclick="toggleNav()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="bg-secondary-container text-on-secondary-container font-bold rounded-lg flex items-center gap-md px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant font-medium flex items-center gap-md px-4 py-3 hover:bg-surface-container-highest transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-md text-label-md">Pulse</span>
+</a>
+<a class="text-on-surface-variant font-medium flex items-center gap-md px-4 py-3 hover:bg-surface-container-highest transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-md text-label-md">Tally</span>
+</a>
+<a class="text-on-surface-variant font-medium flex items-center gap-md px-4 py-3 hover:bg-surface-container-highest transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-md text-label-md">Team Chat</span>
+</a>
+<a class="text-on-surface-variant font-medium flex items-center gap-md px-4 py-3 hover:bg-surface-container-highest transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">Marshal Chat</span>
+</a>
+<a class="text-on-surface-variant font-medium flex items-center gap-md px-4 py-3 hover:bg-surface-container-highest transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-label-md text-label-md">Agents Hub</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-md px-2">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[16px]">settings</span>
+</div>
+<span class="font-label-md text-on-surface">Settings</span>
+</div>
+</div>
+</div>
+<div class="flex-1" onclick="toggleNav()"></div>
+</div>
+<!-- Marshal AI Floating Widget -->
+<div class="fixed bottom-lg right-lg z-[100]">
+<div class="relative group cursor-pointer" id="marshal-trigger">
+<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center ai-glow shadow-xl active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-primary-container text-[32px]">smart_toy</span>
+</div>
+<!-- Notification badge -->
+<div class="absolute -top-1 -right-1 w-5 h-5 bg-error rounded-full border-2 border-background flex items-center justify-center">
+<span class="text-[10px] font-bold text-on-error">2</span>
+</div>
+<!-- Tooltip -->
+<div class="absolute bottom-full right-0 mb-4 whitespace-nowrap bg-surface-container-highest text-on-surface px-md py-2 rounded-lg text-label-md border border-outline-variant opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Marshal AI active. Chat now?
+            </div>
+</div>
+</div>
+<script>
+        function toggleNav() {
+            const overlay = document.getElementById('nav-overlay');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Randomly animate bars for data visualization effect
+        setInterval(() => {
+            const bars = document.querySelectorAll('.pulse-bar');
+            bars.forEach(bar => {
+                const currentH = parseFloat(bar.style.height);
+                const variation = (Math.random() - 0.5) * 10;
+                let newH = Math.min(100, Math.max(20, currentH + variation));
+                if (bar.classList.contains('bg-primary')) {
+                    newH = Math.min(100, Math.max(90, currentH + variation));
+                }
+                bar.style.height = `${newH}%`;
+            });
+        }, 3000);
+
+        // Simple input focus interaction
+        const mainInput = document.querySelector('input[placeholder*="Command"]');
+        mainInput.addEventListener('focus', () => {
+            mainInput.parentElement.classList.add('ai-glow');
+        });
+        mainInput.addEventListener('blur', () => {
+            mainInput.parentElement.classList.remove('ai-glow');
+        });
+    </script>
+
+
+</body></html>

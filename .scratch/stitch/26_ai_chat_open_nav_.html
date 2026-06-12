@@ -1,0 +1,321 @@
+<!DOCTYPE html><html class="dark" lang="en" style="width: 390px; height: 884px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Chat Interface - BUG BOS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#ffb86e",
+                        "surface-variant": "#30353a",
+                        "on-tertiary-fixed": "#2c1600",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-low": "#171c20",
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#4d2b00",
+                        "on-secondary": "#213145",
+                        "surface-container-highest": "#30353a",
+                        "tertiary-fixed": "#ffdcbd",
+                        "surface-container-lowest": "#0a0f13",
+                        "outline": "#88929b",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "error-container": "#93000a",
+                        "surface-bright": "#353a3e",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "surface-container": "#1b2024",
+                        "on-background": "#dee3e9",
+                        "inverse-primary": "#006591",
+                        "on-primary-fixed": "#001e2f",
+                        "tertiary-fixed-dim": "#ffb86e",
+                        "primary-fixed": "#c9e6ff",
+                        "primary": "#89ceff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "inverse-surface": "#dee3e9",
+                        "on-primary": "#00344d",
+                        "on-primary-container": "#003751",
+                        "primary-fixed-dim": "#89ceff",
+                        "inverse-on-surface": "#2c3135",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary": "#492900",
+                        "outline-variant": "#3e4850",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#b7c8e1",
+                        "surface-dim": "#0f1418",
+                        "surface-tint": "#89ceff",
+                        "surface-container-high": "#252b2f",
+                        "on-secondary-container": "#a9bad3",
+                        "background": "#0f1418",
+                        "tertiary-container": "#de8712",
+                        "surface": "#0f1418",
+                        "primary-container": "#0ea5e9",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-surface": "#dee3e9",
+                        "secondary-container": "#3a4a5f",
+                        "on-surface-variant": "#bec8d2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "40px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "max-width": "1440px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "display": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+                        "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll, handle in containers */
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-container-highest');
+            border-radius: theme('borderRadius.full');
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline-variant');
+        }
+        
+        /* Drawer Overlay styling */
+        #drawer-overlay {
+            transition: opacity 0.3s ease;
+        }
+        #navigation-drawer {
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform: translateX(0); /* Start OPEN as requested */
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-full relative">
+<!-- NavigationDrawer (Overlay Nav - OPEN) -->
+<!-- The prompt asks for the drawer to be OPEN (Overlay Nav) and the UI behind not compressed. -->
+<!-- We'll use a fixed positioning for the drawer to overlay the main content. -->
+<!-- Optional: Overlay to dismiss drawer (typically darkens background, but prompt says "UI behind... not compressed", 
+         implying it just sits on top without shifting content. We'll add a subtle overlay for focus.) -->
+<div class="fixed inset-0 bg-black/40 z-40 block md:hidden" id="drawer-overlay"></div>
+<aside class="bg-surface-container-low border-r border-outline-variant h-full w-64 fixed left-0 top-0 flex flex-col py-lg z-50" id="navigation-drawer">
+<!-- Header -->
+<div class="px-md mb-lg flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<img alt="Bug BOS Logo" class="h-8 w-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLv4mNj1Ls_Lin1ipmRccQZgK9SDTv84Pj2jdFRsgxqLesb0tpNg7ooPR-4OfCmi6p6Ui_t2YNZmeUZEmNNabbZveY3o1q3eUD5Lqtk5jonVtgp53NSxX-PrHj5z4oOH8nQ4I1irVcfbaKXSPQNJuyr5Ui_lZJCm2saFENhVDuDGNk9-JK0Yf-MlYHInhGqD1Hth-fcJW--5i1RFxV9uDsFMqjNuN_ns4OCFLPXm001eAOUFzTAy1G5jaQ">
+<span class="font-headline-lg text-headline-lg font-bold tracking-tighter text-primary">BUG BOS</span>
+</div>
+<!-- Close button for mobile/overlay -->
+<button class="md:hidden text-on-surface-variant hover:bg-surface-container-high p-1 rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 px-sm space-y-1 overflow-y-auto">
+<!-- Active Tab: Chat Sessions -->
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm opacity-80 duration-150 group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">chat</span>
+<span class="font-label-md text-label-md flex-1">Chat Sessions</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-md text-label-md flex-1">Knowledge Base</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-md text-label-md flex-1">System Metrics</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md flex-1">Settings</span>
+</a>
+</nav>
+<!-- User Profile snippet at bottom (optional but good practice) -->
+<div class="mt-auto px-md pt-md border-t border-outline-variant/50">
+<div class="flex items-center gap-md hover:bg-surface-container-high p-sm rounded-lg transition-colors cursor-pointer">
+
+<div class="flex-1 min-w-0">
+
+
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<!-- The UI behind is not compressed, so it takes full width and just sits under the overlay drawer -->
+<main class="flex-1 flex flex-col h-full w-full relative pl-0 md:pl-64 transition-all duration-300">
+<!-- TopAppBar -->
+<header class="bg-surface docked full-width top-0 sticky border-b border-outline-variant flex justify-between items-center w-full px-lg h-16 z-30">
+<div class="flex items-center gap-md">
+<!-- Menu icon to toggle drawer (visible mainly on mobile if drawer is closed, but we show it here for completeness) -->
+<button class="text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors md:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-extrabold text-on-surface">New Operation</h1>
+</div>
+<div class="flex items-center gap-md">
+<!-- Model Switcher / Status -->
+<div class="hidden sm:flex items-center gap-sm bg-surface-container-low border border-outline-variant px-sm py-1 rounded-full cursor-pointer hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-tertiary text-sm">memory</span>
+<span class="font-label-sm text-label-sm text-on-surface">GPT-4 Turbo</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high p-2 rounded-full scale-95 duration-100">
+<span class="material-symbols-outlined">settings_input_component</span>
+</button>
+</div>
+</header>
+<!-- Chat History Canvas (Scrollable) -->
+<div class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-lg pb-32 flex flex-col items-center">
+<div class="w-full max-w-[800px] flex flex-col gap-lg">
+<!-- System/AI Greeting -->
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm mb-1">
+<div class="h-6 w-6 rounded-sm bg-surface-container-highest flex items-center justify-center">
+<img alt="Bug Logo Small" class="h-4 w-4 object-contain opacity-70" src="https://lh3.googleusercontent.com/aida/AP1WRLv4mNj1Ls_Lin1ipmRccQZgK9SDTv84Pj2jdFRsgxqLesb0tpNg7ooPR-4OfCmi6p6Ui_t2YNZmeUZEmNNabbZveY3o1q3eUD5Lqtk5jonVtgp53NSxX-PrHj5z4oOH8nQ4I1irVcfbaKXSPQNJuyr5Ui_lZJCm2saFENhVDuDGNk9-JK0Yf-MlYHInhGqD1Hth-fcJW--5i1RFxV9uDsFMqjNuN_ns4OCFLPXm001eAOUFzTAy1G5jaQ">
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">BUG BOS SYSTEM</span>
+</div>
+<div class="font-body-md text-body-md text-on-surface leading-relaxed">
+                        Operation initialized. How can I assist with your data analysis or system queries today?
+                    </div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col gap-xs mt-md">
+<div class="flex items-center gap-sm mb-1 justify-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant">OPERATOR</span>
+<div class="h-6 w-6 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-sm text-label-sm">
+                            OP
+                        </div>
+</div>
+<div class="font-body-md text-body-md text-on-primary-container bg-primary-container/10 p-md rounded-2xl rounded-tr-sm ml-auto max-w-[85%] border border-primary/20">
+                        Analyze the latest telemetry data from Sector 7 and cross-reference it with the known anomalies from last week's log. I need a summary of potential breach vectors.
+                    </div>
+</div>
+<!-- AI Response -->
+<div class="flex flex-col gap-xs mt-md">
+<div class="flex items-center gap-sm mb-1">
+<div class="h-6 w-6 rounded-sm bg-surface-container-highest border border-primary/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: &quot;FILL&quot; 1;">auto_awesome</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">ANALYSIS COMPLETE</span>
+</div>
+<div class="font-body-md text-body-md text-on-surface leading-relaxed">
+<p class="mb-sm">I have processed the telemetry from Sector 7. Comparing it against last week's anomalies reveals three potential breach vectors:</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-sm my-md">
+<!-- Bento/Glassmorphism Data Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-xl hover:border-primary/50 transition-colors">
+<div class="flex items-center gap-sm mb-2">
+<span class="material-symbols-outlined text-error text-sm">router</span>
+<span class="font-label-sm text-label-sm text-on-surface">Vector Alpha</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Unsecured port 8080 traffic spike detected during off-peak hours.</div>
+<div class="mt-2 inline-flex items-center px-2 py-1 rounded bg-error/10 text-error font-label-sm text-label-sm">
+                                    High Risk
+                                </div>
+</div>
+<!-- Bento/Glassmorphism Data Card 2 -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-xl hover:border-primary/50 transition-colors">
+<div class="flex items-center gap-sm mb-2">
+<span class="material-symbols-outlined text-tertiary text-sm">vpn_key</span>
+<span class="font-label-sm text-label-sm text-on-surface">Vector Beta</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Multiple failed authentication attempts via deprecated API endpoints.</div>
+<div class="mt-2 inline-flex items-center px-2 py-1 rounded bg-tertiary/10 text-tertiary font-label-sm text-label-sm">
+                                    Medium Risk
+                                </div>
+</div>
+</div>
+<p class="">I recommend immediate isolation of the affected subnets and a forced credential rotation for all Level 2 personnel.</p>
+</div>
+<!-- Action Chips -->
+<div class="flex flex-wrap gap-sm mt-sm">
+<button class="bg-surface-container-highest border border-outline-variant hover:bg-surface-bright text-on-surface px-3 py-1.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[14px]">play_arrow</span> Execute Isolation
+                        </button>
+<button class="bg-surface-container-highest border border-outline-variant hover:bg-surface-bright text-on-surface px-3 py-1.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[14px]">content_copy</span> Copy Summary
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Anchored Input Bar -->
+<div class="absolute bottom-0 left-0 right-0 p-md md:p-lg bg-gradient-to-t from-background via-background to-transparent z-20 pointer-events-none">
+<div class="max-w-[800px] mx-auto pointer-events-auto">
+<div class="bg-surface-container-low border border-outline-variant rounded-2xl shadow-lg flex flex-col p-2 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<textarea class="w-full bg-transparent border-none text-on-surface font-body-md text-body-md resize-none focus:ring-0 px-2 py-2 min-h-[60px] max-h-[200px]" placeholder="Ask follow-up or provide new directives..."></textarea>
+<div class="flex items-center justify-between mt-2 px-1">
+<!-- Multi-modal Options / Menu -->
+<div class="flex items-center gap-xs">
+<button class="text-on-surface-variant hover:text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors flex items-center justify-center" title="Upload File">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors flex items-center justify-center" title="Web Search">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary hover:bg-surface-container-high p-2 rounded-full transition-colors flex items-center justify-center" title="Use Vision">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+<!-- Submit Button -->
+<button class="bg-primary text-on-primary p-2 rounded-xl hover:bg-primary-fixed-dim transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+</div>
+</div>
+<div class="text-center mt-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant opacity-70">BUG BOS AI may produce inaccurate information. Verify critical data.</span>
+</div>
+</div>
+</div>
+</main>
+
+
+</body></html>

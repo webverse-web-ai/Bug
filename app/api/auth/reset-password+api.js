@@ -29,15 +29,9 @@ export async function POST(request) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Update password
-    user.password = newPassword;
-    
-    // Ensure user is verified since they validated an OTP
-    if (!user.isVerified) {
-      user.isVerified = true;
-    }
-
-    await user.save();
+    // Update password (User.update re-hashes when `password` is present)
+    // and ensure the user is verified since they validated an OTP.
+    await User.update(user._id, { password: newPassword, isVerified: true });
 
     // Delete OTP
     await OTP.deleteMany({ email });

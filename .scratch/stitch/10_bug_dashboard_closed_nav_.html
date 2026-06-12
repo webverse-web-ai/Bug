@@ -1,0 +1,380 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#dee3e9",
+            "secondary-fixed-dim": "#b7c8e1",
+            "surface-container-highest": "#30353a",
+            "secondary-fixed": "#d3e4fe",
+            "surface-container-high": "#252b2f",
+            "on-tertiary-fixed": "#2c1600",
+            "surface-variant": "#30353a",
+            "surface-container-lowest": "#0a0f13",
+            "primary-container": "#0ea5e9",
+            "tertiary-fixed-dim": "#ffb86e",
+            "primary-fixed-dim": "#89ceff",
+            "tertiary-container": "#de8712",
+            "inverse-on-surface": "#2c3135",
+            "primary": "#89ceff",
+            "on-error": "#690005",
+            "on-primary": "#00344d",
+            "surface": "#0f1418",
+            "surface-container": "#1b2024",
+            "on-error-container": "#ffdad6",
+            "tertiary": "#ffb86e",
+            "surface-bright": "#353a3e",
+            "on-secondary": "#213145",
+            "background": "#0f1418",
+            "primary-fixed": "#c9e6ff",
+            "secondary": "#b7c8e1",
+            "on-secondary-container": "#a9bad3",
+            "on-secondary-fixed-variant": "#38485d",
+            "on-background": "#dee3e9",
+            "on-surface-variant": "#bec8d2",
+            "surface-tint": "#89ceff",
+            "on-tertiary": "#492900",
+            "error-container": "#93000a",
+            "tertiary-fixed": "#ffdcbd",
+            "outline-variant": "#3e4850",
+            "surface-container-low": "#171c20",
+            "on-tertiary-container": "#4d2b00",
+            "outline": "#88929b",
+            "on-surface": "#dee3e9",
+            "on-primary-fixed": "#001e2f",
+            "on-secondary-fixed": "#0b1c30",
+            "on-primary-container": "#003751",
+            "error": "#ffb4ab",
+            "secondary-container": "#3a4a5f",
+            "on-tertiary-fixed-variant": "#693c00",
+            "inverse-primary": "#006591",
+            "on-primary-fixed-variant": "#004c6e",
+            "surface-dim": "#0f1418"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "sm": "8px",
+            "base": "4px",
+            "margin-desktop": "32px",
+            "lg": "24px",
+            "md": "16px",
+            "gutter": "16px",
+            "xs": "4px",
+            "xl": "40px",
+            "margin-mobile": "16px",
+            "max-width": "1440px"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "display": ["Inter"],
+            "headline-md": ["Inter"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+    .glass-card {
+      background: rgba(27, 32, 36, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(62, 72, 80, 0.5);
+    }
+    .command-shadow {
+      box-shadow: 0 0 40px rgba(137, 206, 255, 0.1);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f1418;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #30353a;
+      border-radius: 10px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- NavigationDrawer Shell -->
+<aside class="flex flex-col h-screen fixed left-0 top-0 z-40 bg-surface-container h-full w-64 border-r border-outline-variant hidden">
+<div class="p-lg flex flex-col h-full">
+<!-- Brand Logo -->
+<div class="mb-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary">Bug.</span>
+</div>
+<!-- Nav Items -->
+<nav class="flex-1 space-y-base">
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-bold rounded-lg duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Pulse</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-body-md text-body-md">Tally</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="font-body-md text-body-md">Team Chat</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-body-md text-body-md">Marshal Chat</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="font-body-md text-body-md">Agents Hub</span>
+</a>
+</nav>
+<!-- Profile Section -->
+<div class="mt-auto pt-lg border-t border-outline-variant">
+<div class="flex items-center gap-md">
+<img alt="User profile photo" class="w-10 h-10 rounded-full" data-alt="A professional headshot of a female executive in a high-tech corporate office environment. She is wearing a modern charcoal grey blazer. The lighting is crisp and cool-toned, with bokeh-style city lights visible through a floor-to-ceiling window in the background, reflecting a sophisticated dark-mode aesthetic with blue and slate grey tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMAfhTNRfewo6ZGZAROcR8UMWMMPKYV7IPGW3s8OrlqVE_Xj66gvQID0f1alQ9OC-zRjMbt3hAF0PrNiNSWXOmULDwz7UOIVceW_RSiOmFHSQHPjWLQFiLRKa6ZVNVvJPMoYKrQzP0lqlrCg0dTZ8LDUx4XKlDRsQ51Ea5YWARmdl_96EiaEASfAEU2QtNuILsX_ZWxdVyNIAEUaEWjj3rxSROOboWdyzNL21tmLfxQrGKEk_HAnQzdD8lOFJMVoJcsjxN_uIVk4g">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-surface">Alex Morgan</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Operations Lead</span>
+</div>
+</div>
+<button class="mt-md w-full text-left font-label-sm text-label-sm text-primary hover:underline">Settings &amp; Logout</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="min-h-screen relative flex flex-col ml-0">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-md ml-0 w-full h-16 bg-surface border-b border-outline-variant sticky top-0 z-30">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-sm rounded-lg transition-transform scale-95" data-icon="menu">menu</button>
+<h1 class="font-headline-md text-headline-md text-on-surface font-bold">Dashboard</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-label-md text-label-md text-on-surface-variant"><br></span>
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low p-sm rounded-lg transition-transform scale-95" data-icon="dark_mode">dark_mode</button>
+</div>
+</header>
+<!-- Content -->
+<div class="flex-1 px-xl py-xl max-w-max-width mx-auto w-full">
+<!-- Perplexity-style Command Center -->
+<section class="max-w-3xl mx-auto mb-xl text-center space-y-lg">
+<h2 class="font-display text-display text-on-surface">Good Morning, Alex.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your operations are running at 98.4% efficiency.</p>
+<div class="relative mt-xl group">
+<div class="absolute inset-0 bg-primary/10 blur-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
+<div class="relative glass-card rounded-xl p-base flex items-center gap-md border border-outline-variant focus-within:border-primary transition-all duration-300 command-shadow">
+<span class="material-symbols-outlined ml-md text-outline" data-icon="search">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-lg font-body-lg text-on-surface placeholder:text-outline" placeholder="Command Bug..." type="text">
+<div class="flex gap-sm mr-sm">
+<kbd class="px-sm py-xs bg-surface-container-highest border border-outline-variant rounded font-label-sm text-label-sm text-on-surface-variant">⌘</kbd>
+<kbd class="px-sm py-xs bg-surface-container-highest border border-outline-variant rounded font-label-sm text-label-sm text-on-surface-variant">K</kbd>
+</div>
+</div>
+<div class="flex justify-center gap-md mt-lg">
+<button class="px-lg py-sm bg-primary text-on-primary font-bold rounded-lg hover:scale-105 transition-transform flex items-center gap-sm">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="">Create New Sub-Agent</span>
+</button>
+<button class="px-lg py-sm bg-surface-container-high border border-outline-variant text-on-surface rounded-lg hover:bg-surface-container-highest transition-colors">
+              Deploy Protocol
+            </button>
+</div>
+</div>
+</section>
+<!-- Bento Grid Insights -->
+<section class="grid grid-cols-12 gap-lg mt-xl">
+<!-- Main KPI Chart -->
+<div class="col-span-12 lg:col-span-8 glass-card rounded-xl p-lg flex flex-col">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface">Efficiency Pulse</h3>
+<span class="font-label-md text-label-md px-sm py-xs bg-primary/10 text-primary rounded border border-primary/20">+12% vs last week</span>
+</div>
+<div class="h-64 flex items-end gap-base">
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[40%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[60%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[55%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[80%]"></div>
+<div class="flex-1 bg-primary rounded-t h-[95%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[75%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[85%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[90%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[65%]"></div>
+<div class="flex-1 bg-surface-container-highest rounded-t hover:bg-primary/50 transition-colors h-[70%]"></div>
+</div>
+<div class="flex justify-between mt-md font-label-sm text-label-sm text-on-surface-variant">
+<span class="">08:00</span>
+<span class="">12:00</span>
+<span class="">16:00</span>
+<span class="">20:00</span>
+<span class="">00:00</span>
+</div>
+</div>
+<!-- AI Insight Summary -->
+<div class="col-span-12 lg:col-span-4 glass-card rounded-xl p-lg border-primary/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-md opacity-20">
+<span class="material-symbols-outlined text-primary scale-[3]" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="bolt">bolt</span>
+            AI Summary
+          </h3>
+<div class="space-y-md">
+<p class="font-body-md text-body-md text-on-surface-variant">The <span class="text-primary font-bold">Marketing-Alpha</span> agent is detecting a surge in intent signals from the EMEA region. I recommend spinning up a new sub-agent to handle high-touch outreach.</p>
+<ul class="space-y-sm">
+<li class="flex items-center gap-sm text-on-surface font-label-md">
+<span class="w-1 h-1 bg-primary rounded-full"></span>
+                Traffic up 22% in UK
+              </li>
+<li class="flex items-center gap-sm text-on-surface font-label-md">
+<span class="w-1 h-1 bg-primary rounded-full"></span>
+                Lead quality scoring 8.4/10
+              </li>
+</ul>
+<button class="w-full py-sm bg-surface-container-highest border border-outline-variant text-primary rounded-lg hover:bg-surface-container-low transition-colors font-bold mt-md">
+              Review EMEA Strategy
+            </button>
+</div>
+</div>
+<!-- Active Agents Grid -->
+<div class="col-span-12 glass-card rounded-xl p-lg">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface">Agent Hub Matrix</h3>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">View All Agents →</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
+<!-- Agent Card 1 -->
+<div class="p-md rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-tertiary/10 rounded-lg">
+<span class="material-symbols-outlined text-tertiary" data-icon="support_agent">support_agent</span>
+</div>
+<span class="font-label-sm text-label-sm px-xs py-base bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">Active</span>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Support-01</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Handling 42 tickets</p>
+<div class="mt-md w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-tertiary w-[70%] h-full"></div>
+</div>
+</div>
+<!-- Agent Card 2 -->
+<div class="p-md rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<span class="font-label-sm text-label-sm px-xs py-base bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">Active</span>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Growth-Alpha</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Optimizing ad spend</p>
+<div class="mt-md w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-primary w-[92%] h-full"></div>
+</div>
+</div>
+<!-- Agent Card 3 -->
+<div class="p-md rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary/50 transition-colors opacity-80">
+<div class="flex justify-between items-start mb-md">
+<div class="p-sm bg-secondary/10 rounded-lg">
+<span class="material-symbols-outlined text-secondary" data-icon="database">database</span>
+</div>
+<span class="font-label-sm text-label-sm px-xs py-base bg-on-surface-variant/10 text-on-surface-variant border border-outline rounded">Standby</span>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface">Data-Sync</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Last sync 4m ago</p>
+<div class="mt-md w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-secondary w-[20%] h-full"></div>
+</div>
+</div>
+<!-- Agent Card 4 -->
+<div class="p-md rounded-lg border border-dashed border-outline-variant hover:border-primary/50 flex flex-col items-center justify-center text-center group cursor-pointer transition-all">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors mb-sm" data-icon="add">add</span>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary transition-colors">Deploy New Agent</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar / Floating Marshal Widget -->
+<aside class="fixed bottom-8 right-8 z-50 flex items-center justify-center">
+<div class="relative group">
+<!-- Label tooltip -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 px-md py-sm bg-inverse-surface text-inverse-on-surface rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap font-label-md">
+        Summon Marshal Chat
+      </div>
+<button class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full w-14 h-14 shadow-xl flex items-center justify-center animate-pulse hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" data-icon="chat_bubble" style="font-variation-settings: &quot;FILL&quot; 1;">chat_bubble</span>
+</button>
+</div>
+</aside>
+<!-- Notification Toast Simulation -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+
+</div>
+<script>
+    // Simple micro-interactions
+    window.addEventListener('DOMContentLoaded', () => {
+      // Simulate toast appearance
+      setTimeout(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          toast.classList.remove('translate-y-20');
+        }, 100);
+      }, 2000);
+
+      // Search bar focus effect
+      const searchInput = document.querySelector('input[type="text"]');
+      searchInput.addEventListener('focus', () => {
+        console.log('Command Bug active...');
+      });
+
+      // Simple click animation for agent cards
+      document.querySelectorAll('.glass-card, .bg-surface-container-low').forEach(card => {
+        card.addEventListener('mousedown', () => {
+          card.classList.add('scale-[0.98]');
+        });
+        card.addEventListener('mouseup', () => {
+          card.classList.remove('scale-[0.98]');
+        });
+      });
+    });
+  </script>
+
+
+
+
+</body></html>

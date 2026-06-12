@@ -1,4 +1,4 @@
-import { firestore } from '../lib/db';
+import { firestore, toMillis } from '../lib/db';
 
 const Chat = {
   collection: firestore.collection('chats'),
@@ -16,11 +16,11 @@ const Chat = {
 
   async find(query) {
     if (query.user) {
-      const snapshot = await this.collection
-        .where('user', '==', query.user)
-        .orderBy('updatedAt', 'desc')
-        .get();
-      return snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
+      // No .orderBy() — sorting in memory avoids a required composite index.
+      const snapshot = await this.collection.where('user', '==', query.user).get();
+      const docs = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
+      docs.sort((a, b) => toMillis(b.updatedAt) - toMillis(a.updatedAt));
+      return docs;
     }
     return [];
   },

@@ -1,0 +1,476 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bug BOS - Pulse OMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-lowest": "#0a0f13",
+                        "surface": "#0f1418",
+                        "secondary-container": "#3a4a5f",
+                        "on-primary-fixed": "#001e2f",
+                        "primary-container": "#0ea5e9",
+                        "surface-container-low": "#171c20",
+                        "on-secondary": "#213145",
+                        "surface-container": "#1b2024",
+                        "on-secondary-fixed": "#0b1c30",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#252b2f",
+                        "on-surface-variant": "#bec8d2",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "primary": "#89ceff",
+                        "on-secondary-container": "#a9bad3",
+                        "tertiary-fixed-dim": "#ffb86e",
+                        "outline": "#88929b",
+                        "outline-variant": "#3e4850",
+                        "inverse-surface": "#dee3e9",
+                        "on-tertiary": "#492900",
+                        "surface-container-highest": "#30353a",
+                        "surface-tint": "#89ceff",
+                        "inverse-primary": "#006591",
+                        "surface-bright": "#353a3e",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#0f1418",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed": "#2c1600",
+                        "on-error": "#690005",
+                        "on-background": "#dee3e9",
+                        "primary-fixed-dim": "#89ceff",
+                        "surface-variant": "#30353a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-container": "#4d2b00",
+                        "tertiary-container": "#de8712",
+                        "on-primary": "#00344d",
+                        "secondary": "#b7c8e1",
+                        "tertiary": "#ffb86e",
+                        "primary-fixed": "#c9e6ff",
+                        "on-primary-container": "#003751",
+                        "inverse-on-surface": "#2c3135",
+                        "on-surface": "#dee3e9",
+                        "background": "#0f1418",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdcbd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "max-width": "1440px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3e4850;
+            border-radius: 10px;
+        }
+        .glass-panel {
+            background: rgba(27, 32, 36, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(136, 146, 155, 0.1);
+        }
+        .ai-glow {
+            box-shadow: 0 0 15px rgba(137, 206, 255, 0.3);
+            border: 1px solid rgba(137, 206, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- Navigation Drawer -->
+<aside class="h-full w-64 fixed left-0 top-0 bg-surface-container dark:bg-surface-container shadow-sm flex flex-col gap-base p-md z-50 hidden md:flex border-r border-outline-variant">
+<div class="flex items-center gap-sm mb-lg">
+<img alt="Bug Logo" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9XHmSyhp3yNZz8yk7B1V-bhVrlWQNXY5xWKNcJ69mp24MSHSWOPKO1LMqTxy3TWUIVqdVvkgNHdQ3S-U0OwA_QbOiJkotzguwZ_5INKiXFB1F8b-3g0jBeSM0EYOTBmXcb2pPjb18wJhDfGaa3rZRquYrG0jIamz8k7FN1PEgyaWwDTwaSwFq5Vx12YkRZSf0ykkHffF2I7EKSE91gr3gj0gIGyV9AjGZUXRzQw4-fJ83yQkZrE5hUtoRT_dj0IezXBMs8CBdlvI">
+<span class="font-display text-headline-md text-primary">Bug BOS</span>
+</div>
+<nav class="flex flex-col gap-1">
+<div class="flex items-center gap-md p-md text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer rounded-lg">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-md p-md bg-secondary-container text-on-secondary-container font-bold rounded-lg transition-all duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="font-label-md text-label-md">Pulse</span>
+</div>
+<div class="flex items-center gap-md p-md text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer rounded-lg">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-md text-label-md">Tally</span>
+</div>
+<div class="flex items-center gap-md p-md text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer rounded-lg">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-md text-label-md">Team Chat</span>
+</div>
+<div class="flex items-center gap-md p-md text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer rounded-lg">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">Marshal Chat</span>
+</div>
+<div class="flex items-center gap-md p-md text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer rounded-lg">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-label-md text-label-md">Agents Hub</span>
+</div>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<div class="flex items-center gap-sm p-sm rounded-xl hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md font-bold text-on-surface">Ops Admin</span>
+<span class="text-xs text-on-surface-variant">Level 4 Node</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen transition-all duration-300">
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant z-40 flex items-center justify-between px-md h-16">
+<div class="flex items-center gap-md flex-1">
+<span class="material-symbols-outlined md:hidden text-on-surface">menu</span>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary">Pulse OMS</h1>
+<!-- Search Bar -->
+<div class="hidden md:flex flex-1 max-w-xl mx-lg relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Search orders, shipments, nodes..." type="text">
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest text-[10px] text-on-surface-variant font-label-sm border border-outline-variant">⌘</kbd>
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest text-[10px] text-on-surface-variant font-label-sm border border-outline-variant">K</kbd>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-surface-container-high transition-colors rounded-full relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-lg overflow-hidden border border-outline-variant">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAafNIvNoGIj2KNq8cHa8hn1rbXIJuaZfUfT7gInrSYgYMD3CtOHNtZX3vCQcLgFRw0qrXzn_qC9vzDvDEoOyYRjcLvBWPEM0MDGFmlo5MhW-8MUo5P72aYYzxKDGalOoq4YMpKjVlDhJUYeZVTNFHR7Iwfz3EreYrRUcZXQR_PKe2WhbsyW7y86r29uh10JxTNzuS003U_7lJYHm1wDl37iD0ePEoePGayiWiZJ5D9kCF-qcz_hMLZd-BssLm2VbXAaxqSNnjXqqw">
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="p-md lg:p-lg space-y-lg max-w-screen-2xl mx-auto">
+<!-- KPI Section (Asymmetric Layout) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="glass-panel p-md rounded-xl flex flex-col justify-between group hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+<span class="text-emerald-400 text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> 12%
+                        </span>
+</div>
+<div class="mt-md">
+<h3 class="text-on-surface-variant font-label-md text-label-md">Total Orders</h3>
+<p class="font-display text-display text-on-surface mt-xs">1,240</p>
+</div>
+</div>
+<div class="glass-panel p-md rounded-xl flex flex-col justify-between group hover:border-tertiary/50 transition-colors">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<span class="text-tertiary text-label-sm flex items-center gap-1">
+                            Current Pulse
+                        </span>
+</div>
+<div class="mt-md">
+<h3 class="text-on-surface-variant font-label-md text-label-md">Pending Orders</h3>
+<p class="font-display text-display text-on-surface mt-xs">42</p>
+</div>
+</div>
+<div class="glass-panel p-md rounded-xl flex flex-col justify-between bg-gradient-to-br from-surface-container to-primary-container/10 border-primary/20">
+<div class="flex justify-between items-start">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="h-6 w-24 bg-surface-container-highest/50 rounded-full overflow-hidden flex items-center px-1">
+<div class="h-1 bg-primary rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div class="mt-md">
+<h3 class="text-on-surface-variant font-label-md text-label-md">Revenue (MTD)</h3>
+<p class="font-display text-display text-on-surface mt-xs">$124k</p>
+</div>
+</div>
+</section>
+<!-- Fulfillment Pipeline (Bento Style Kanban) -->
+<section class="space-y-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">view_kanban</span>
+                        Fulfillment Pipeline
+                    </h2>
+<div class="flex gap-sm">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">add</span> Create Order
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md overflow-x-auto pb-4 custom-scrollbar">
+<!-- Column: To-Do -->
+<div class="flex flex-col gap-md min-w-[300px]">
+<div class="flex items-center justify-between px-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span> To-Do
+                            </span>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-xs text-on-surface-variant">18</span>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="glass-panel p-md rounded-xl space-y-sm hover:scale-[1.02] transition-transform cursor-grab active:cursor-grabbing">
+<div class="flex justify-between">
+<span class="text-primary font-label-sm">#ORD-9981</span>
+<span class="text-xs text-on-surface-variant">2h ago</span>
+</div>
+<p class="text-on-surface font-medium">Bulk Micro-Module Batch A</p>
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-surface bg-slate-500"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-blue-500"></div>
+</div>
+<span class="text-xs text-on-surface-variant">+3 items</span>
+</div>
+</div>
+<div class="glass-panel p-md rounded-xl space-y-sm hover:scale-[1.02] transition-transform cursor-grab active:cursor-grabbing">
+<div class="flex justify-between">
+<span class="text-primary font-label-sm">#ORD-9985</span>
+<span class="text-xs text-on-surface-variant">4h ago</span>
+</div>
+<p class="text-on-surface font-medium">Neural Core Upgrade Kit</p>
+<div class="px-2 py-0.5 bg-error-container/20 text-error text-[10px] rounded uppercase font-bold w-fit">Urgent</div>
+</div>
+</div>
+</div>
+<!-- Column: Processing -->
+<div class="flex flex-col gap-md min-w-[300px]">
+<div class="flex items-center justify-between px-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> Processing
+                            </span>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-xs text-on-surface-variant">12</span>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="glass-panel p-md rounded-xl border-l-2 border-l-tertiary space-y-sm hover:scale-[1.02] transition-transform cursor-grab active:cursor-grabbing">
+<div class="flex justify-between">
+<span class="text-primary font-label-sm">#ORD-9942</span>
+<span class="text-xs text-tertiary">In Progress</span>
+</div>
+<p class="text-on-surface font-medium">Global Node Sync Array</p>
+<div class="w-full bg-surface-container-highest h-1 rounded-full">
+<div class="bg-tertiary h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Shipped -->
+<div class="flex flex-col gap-md min-w-[300px]">
+<div class="flex items-center justify-between px-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Shipped
+                            </span>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-xs text-on-surface-variant">24</span>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="glass-panel p-md rounded-xl border-l-2 border-l-primary space-y-sm opacity-80 hover:opacity-100 transition-all cursor-grab active:cursor-grabbing">
+<div class="flex justify-between">
+<span class="text-primary font-label-sm">#ORD-9910</span>
+<span class="text-xs text-primary">In Transit</span>
+</div>
+<p class="text-on-surface font-medium">Titanium Chassis V2</p>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+                                    Tracking: CX-1029384
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Transaction Logs (Modern Table) -->
+<section class="space-y-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Recent Activity Logs</h2>
+<button class="text-primary text-label-md hover:underline">View All History</button>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high border-b border-outline-variant">
+<tr>
+<th class="p-md text-label-md font-bold text-on-surface-variant">TIMESTAMP</th>
+<th class="p-md text-label-md font-bold text-on-surface-variant">ENTITY</th>
+<th class="p-md text-label-md font-bold text-on-surface-variant">ACTION</th>
+<th class="p-md text-label-md font-bold text-on-surface-variant">VALUE</th>
+<th class="p-md text-label-md font-bold text-on-surface-variant">STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-highest transition-colors">
+<td class="p-md text-label-sm">2023-10-24 14:22:01</td>
+<td class="p-md font-medium">Node-Gamma-4</td>
+<td class="p-md text-on-surface-variant">Order Verification</td>
+<td class="p-md font-label-sm text-primary">$4,200.00</td>
+<td class="p-md">
+<span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20 uppercase tracking-tighter">Verified</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest transition-colors">
+<td class="p-md text-label-sm">2023-10-24 14:15:45</td>
+<td class="p-md font-medium">User: amara_ops</td>
+<td class="p-md text-on-surface-variant">Batch Cancellation</td>
+<td class="p-md font-label-sm text-on-surface-variant">N/A</td>
+<td class="p-md">
+<span class="px-2 py-1 bg-error/10 text-error text-[10px] font-bold rounded border border-error/20 uppercase tracking-tighter">Reversed</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest transition-colors">
+<td class="p-md text-label-sm">2023-10-24 13:58:12</td>
+<td class="p-md font-medium">Fulfillment-Center-1</td>
+<td class="p-md text-on-surface-variant">Inventory Sync</td>
+<td class="p-md font-label-sm text-primary">+144 Units</td>
+<td class="p-md">
+<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20 uppercase tracking-tighter">Synced</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<!-- Marshal AI Widget -->
+<div class="fixed bottom-lg right-lg z-50 group" id="ai-widget">
+<div class="hidden absolute bottom-20 right-0 w-80 glass-panel ai-glow rounded-2xl overflow-hidden flex flex-col transition-all duration-300 transform scale-95 opacity-0" id="ai-chat">
+<div class="p-md bg-primary-container text-on-primary-container flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+<span class="font-bold text-label-md">Marshal AI Assistant</span>
+</div>
+<div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+</div>
+<div class="p-md h-64 custom-scrollbar overflow-y-auto space-y-md text-sm">
+<div class="flex gap-2">
+<div class="w-6 h-6 rounded bg-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+</div>
+<div class="bg-surface-container-highest p-sm rounded-lg rounded-tl-none">
+                        Commander, I noticed a 4% slowdown in shipping at the East Hub. Shall I re-route the pending batch?
+                    </div>
+</div>
+</div>
+<div class="p-sm bg-surface-container-low border-t border-outline-variant flex gap-sm">
+<input class="bg-transparent border-none text-sm w-full focus:ring-0" placeholder="Ask Marshal..." type="text">
+<button class="text-primary hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg ai-glow flex items-center justify-center hover:scale-105 active:scale-95 transition-all" onclick="toggleAI()">
+<span class="material-symbols-outlined text-3xl">smart_toy</span>
+</button>
+</div>
+<!-- Mobile Bottom Nav -->
+<nav class="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant md:hidden grid grid-cols-4 h-16 z-50">
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="text-[10px]">Pulse</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">package_2</span>
+<span class="text-[10px]">Orders</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">Settings</span>
+</div>
+</nav>
+<script>
+        function toggleAI() {
+            const chat = document.getElementById('ai-chat');
+            if (chat.classList.contains('hidden')) {
+                chat.classList.remove('hidden');
+                setTimeout(() => {
+                    chat.classList.remove('scale-95', 'opacity-0');
+                    chat.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                chat.classList.add('scale-95', 'opacity-0');
+                chat.classList.remove('scale-100', 'opacity-100');
+                setTimeout(() => {
+                    chat.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Add visual flair to KPI cards on hover
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+
+
+</body></html>

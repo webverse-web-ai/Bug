@@ -6,12 +6,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
 export async function POST(request) {
   try {
-    console.log('API Route Hit: login');
-    console.log('MONGODB_URI starts with:', process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 15) : 'undefined');
-    
     await connectToDatabase();
-    console.log('Firebase connected');
-    
+
     const body = await request.json();
     const { email, password } = body;
 

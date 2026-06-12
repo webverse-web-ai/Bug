@@ -1,0 +1,398 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Bug BOS | Team Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-lowest": "#0a0f13",
+                        "surface": "#0f1418",
+                        "secondary-container": "#3a4a5f",
+                        "on-primary-fixed": "#001e2f",
+                        "primary-container": "#0ea5e9",
+                        "surface-container-low": "#171c20",
+                        "on-secondary": "#213145",
+                        "surface-container": "#1b2024",
+                        "on-secondary-fixed": "#0b1c30",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#252b2f",
+                        "on-surface-variant": "#bec8d2",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "primary": "#89ceff",
+                        "on-secondary-container": "#a9bad3",
+                        "tertiary-fixed-dim": "#ffb86e",
+                        "outline": "#88929b",
+                        "outline-variant": "#3e4850",
+                        "inverse-surface": "#dee3e9",
+                        "on-tertiary": "#492900",
+                        "surface-container-highest": "#30353a",
+                        "surface-tint": "#89ceff",
+                        "inverse-primary": "#006591",
+                        "surface-bright": "#353a3e",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#0f1418",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed": "#2c1600",
+                        "on-error": "#690005",
+                        "on-background": "#dee3e9",
+                        "primary-fixed-dim": "#89ceff",
+                        "surface-variant": "#30353a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-container": "#4d2b00",
+                        "tertiary-container": "#de8712",
+                        "on-primary": "#00344d",
+                        "secondary": "#b7c8e1",
+                        "tertiary": "#ffb86e",
+                        "primary-fixed": "#c9e6ff",
+                        "on-primary-container": "#003751",
+                        "inverse-on-surface": "#2c3135",
+                        "on-surface": "#dee3e9",
+                        "background": "#0f1418",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdcbd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "max-width": "1440px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #171c20;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3e4850;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #88929b;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen flex flex-col">
+<!-- Top Navigation Anchor (Shared Component Mapping) -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary w-full top-0 sticky border-b border-outline-variant dark:border-outline-variant flex items-center justify-between px-md h-16 z-50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined cursor-pointer active:scale-95 text-on-surface-variant" data-icon="menu">menu</span>
+<div class="flex items-center gap-sm">
+<img alt="Bug BOS Logo" class="h-8 w-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9XHmSyhp3yNZz8yk7B1V-bhVrlWQNXY5xWKNcJ69mp24MSHSWOPKO1LMqTxy3TWUIVqdVvkgNHdQ3S-U0OwA_QbOiJkotzguwZ_5INKiXFB1F8b-3g0jBeSM0EYOTBmXcb2pPjb18wJhDfGaa3rZRquYrG0jIamz8k7FN1PEgyaWwDTwaSwFq5Vx12YkRZSf0ykkHffF2I7EKSE91gr3gj0gIGyV9AjGZUXRzQw4-fJ83yQkZrE5hUtoRT_dj0IezXBMs8CBdlvI">
+<span class="font-display text-headline-md text-primary dark:text-primary tracking-tighter">Bug BOS</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center bg-surface-container-low border border-outline-variant rounded-lg px-sm py-1.5 w-64">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px] mr-2">search</span>
+<span class="text-on-surface-variant font-label-md text-label-md">Search across Bug BOS...</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden cursor-pointer active:scale-95">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot avatar of a technical lead in a modern corporate setting. The lighting is crisp and cool, reflecting a high-tech environment. The individual is wearing professional attire against a neutral, dark charcoal background. The image is clean, sharp, and reflects an intelligent, reliable workspace persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc7SFtC6oNEwnXg4gj8MIkJa84cBAY9ksFdvzb1-vu-I-w8ITsufMPbkeBh4vyt1fSFhtE9b_FEqko7bAst_cCOua8z_aHPUzsrC3QNLNRHyjugtLRaKG6yb0GKzCh3UD0JEyCO8TXMiMPSGA6-HBMleulGobbGEpn7qsTk2J8B2uqJHRqxLJvL0KnTYltUKuB12tGfAxsI8bYNwdZAh9Px-rq7GRir3qJruvtTEsU2Y6cf9hSpdO0ZVYSA1RAxdDrwsvakYTa3F0">
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Navigation Drawer Sidebar (Shared Component Mapping) -->
+<aside class="h-full w-64 hidden md:flex flex-col gap-base p-md bg-surface-container dark:bg-surface-container shadow-sm border-r border-outline-variant/30">
+<nav class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-md text-label-md">Pulse</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span class="font-label-md text-label-md">Tally</span>
+</div>
+<!-- ACTIVE TAB: Team Chat -->
+<div class="flex items-center gap-sm p-sm bg-secondary-container text-on-secondary-container font-bold rounded-lg transition-all duration-200 ease-in-out cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-label-md text-label-md">Team Chat</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-md text-label-md">Marshal Chat</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="font-label-md text-label-md">Agents Hub</span>
+</div>
+</nav>
+<div class="mt-lg border-t border-outline-variant pt-lg flex flex-col gap-md">
+<!-- Channels Section -->
+<div class="flex flex-col gap-xs">
+<div class="flex items-center justify-between px-sm mb-xs">
+<span class="font-label-sm text-label-sm text-outline tracking-wider uppercase">Channels</span>
+<span class="material-symbols-outlined text-[16px] text-outline cursor-pointer hover:text-primary">add</span>
+</div>
+<div class="px-sm py-1 rounded-lg bg-surface-container-highest text-on-surface font-medium flex items-center gap-xs cursor-pointer">
+<span class="font-label-md text-on-surface-variant">#</span>
+<span class="font-body-sm text-body-sm">general</span>
+</div>
+<div class="px-sm py-1 rounded-lg hover:bg-surface-container-high text-on-surface-variant flex items-center gap-xs cursor-pointer transition-colors">
+<span class="font-label-md">#</span>
+<span class="font-body-sm text-body-sm">marketing</span>
+</div>
+<div class="px-sm py-1 rounded-lg hover:bg-surface-container-high text-on-surface-variant flex items-center gap-xs cursor-pointer transition-colors">
+<span class="font-label-md">#</span>
+<span class="font-body-sm text-body-sm">ops-war-room</span>
+<span class="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+</div>
+<!-- DMs Section -->
+<div class="flex flex-col gap-xs">
+<div class="flex items-center justify-between px-sm mb-xs">
+<span class="font-label-sm text-label-sm text-outline tracking-wider uppercase">Direct Messages</span>
+<span class="material-symbols-outlined text-[16px] text-outline cursor-pointer hover:text-primary">add</span>
+</div>
+<div class="px-sm py-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant flex items-center gap-sm cursor-pointer transition-colors group">
+<div class="w-6 h-6 rounded bg-on-secondary-fixed-variant flex items-center justify-center text-[10px] font-bold text-white relative">
+                            JD
+                            <span class="absolute bottom-0 right-0 w-1.5 h-1.5 bg-emerald-500 rounded-full border border-surface-container"></span>
+</div>
+<span class="font-body-sm text-body-sm">Jordan Doe</span>
+</div>
+<div class="px-sm py-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant flex items-center gap-sm cursor-pointer transition-colors group">
+<div class="w-6 h-6 rounded bg-tertiary-container flex items-center justify-center text-[10px] font-bold text-white relative">
+                            SL
+                            <span class="absolute bottom-0 right-0 w-1.5 h-1.5 bg-outline rounded-full border border-surface-container"></span>
+</div>
+<span class="font-body-sm text-body-sm">Sarah Linn</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas (Chat Area) -->
+<main class="flex-1 flex flex-col bg-surface relative min-w-0">
+<!-- Chat Header -->
+<header class="h-14 border-b border-outline-variant/30 flex items-center justify-between px-lg shrink-0">
+<div class="flex items-center gap-sm">
+<span class="text-on-surface-variant font-headline-md text-headline-md">#</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">general</h2>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px] cursor-pointer ml-1">star</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex -space-x-2">
+<img alt="Alex" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="A portrait-style headshot of a young professional man with a friendly expression. He is wearing modern, minimalist tech-wear in a bright, clean office environment. The image is saturated with soft ambient light, emphasizing a high-productivity, creative culture. The color grade is cool and crisp." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnSMnfMa55A_a809xBnv9_aJVPwIPh6SJkTjY28zJQYWQwJ3QIKsQhynnFZB8P7YoSatVvDR669QsIadOiBXlNOF7pFtU_d26rXRUYguKMp-nXsfMomoSCM1Ng1enMZl-PMU2Qgn_gg1-THllPukINyY7bOF8iHNBgnDQXvY0DW_RARnhdrQ3BYgFl-fSC4U0gc_t7pHeSmT1rP_l3AtgITzFr_v_-Vf9kIHCn1AXE_x-zGoKEnO9Muo8yy-thXZxGBzDsuGA7gwg">
+<img alt="Sarah" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="A close-up professional headshot of a woman in her late 20s with a confident and focused demeanor. She is set against a blurred background of a modern data center with glowing blue and white LEDs. The visual style is futuristic and technical, using a palette of deep blues and vibrant cyans." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcs5cgdkVPH1C_AOnxHHz2DT9O8O-04Wmim9Odh41XftXY_pXU4YoSWRh7udjaOoIA9EuOpu3CAXZ0r42kIZHfTr6NqEFN0IYALhAJXOmTReEHlB7zqgWKBIp2GT5jOonwklmf_BOUKNMXjc8lfOTpQESUnxxTTZ9IwbBNxBzc2qiyheKacabni9es-S_nIrSV_xmtc2sIBZFWLs697574v7A3eTG2AI0DaUuJPo0Sc-Dzi3ebWjuy_t3VWfO6jNsbLw3ri8IbeNY">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">+12</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">info</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">settings</span>
+</div>
+</header>
+<!-- Message List -->
+<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-lg custom-scrollbar">
+<!-- System/AI Insight Message -->
+<div class="bg-surface-container-low border border-primary-container/20 rounded-xl p-md flex gap-md relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<div class="w-10 h-10 shrink-0 bg-primary-container/20 rounded-lg flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-sm mb-xs">
+<span class="font-bold text-primary font-label-md text-label-md">Marshal AI agent</span>
+<span class="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-label-sm text-[10px] uppercase border border-primary/20">System Insight</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">09:15 AM</span>
+</div>
+<p class="text-on-surface text-body-sm leading-relaxed">
+                            Analysis of <code class="bg-surface-container-highest px-1 rounded text-primary">#ops-war-room</code> suggests an emerging bottleneck in deployment pipeline A. I've pre-drafted a mitigation strategy. Should I post the summary here or in the war room?
+                        </p>
+</div>
+</div>
+<!-- Chat Message: Sarah Linn -->
+<div class="flex gap-md group">
+<div class="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-tertiary-container">
+<img alt="Sarah Linn" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYTZ6ENu5eYJ9zm-pgsz_QgFAd-zJf-C7qIMKT-H2Z8VMewo0cjpVTN_YHr5CiYpbB_vBN_YKll6mFowxj7rdovrsxtXpDqV0hrMZUIjNA77a5lZXLm2Eli-4F2ceoaBMW8ce0a9UHWt3FFLXOnLUA-W5UDGb7ET0ukWtjUOtd0VMZ5G3X7O9djzN7h4TS-fTOWblF1z9gIDbBGi3OHSwh_qvVUzoR62kT60f4f7nSBYv6GNL4hXwatbtazR4BubSIcIAerNQvBSU">
+</div>
+<div class="flex-1">
+<div class="flex items-baseline gap-sm mb-1">
+<span class="font-bold text-on-surface hover:underline cursor-pointer">Sarah Linn</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">09:22 AM</span>
+</div>
+<div class="text-on-surface text-body-sm leading-relaxed">
+                            Marshal, go ahead and post the summary here first. Alex and I are already looking at the load balancer metrics. 
+                        </div>
+<div class="mt-sm flex gap-xs">
+<div class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full border border-outline-variant hover:border-primary cursor-pointer transition-all">
+<span class="text-[14px]">👍</span>
+<span class="text-[12px] font-bold text-primary">3</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full border border-outline-variant hover:border-primary cursor-pointer transition-all">
+<span class="text-[14px]">🚀</span>
+<span class="text-[12px] font-bold text-primary">1</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Message: Alex Morgan -->
+<div class="flex gap-md group">
+<div class="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-on-secondary-fixed-variant">
+<img alt="Alex Morgan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy64QEm2t5mgGh3Le96cqLq0nNdEAcqAAocQQwE6CRfs2x01EPPq2We8AFhJsWKfKrz0nTQ5CZaVdHxaoQHLzEBJNdnr_kDJbSwMRG3SOzjYtg5h0r62I4kqmSG5t6MrEQHcFhre6MamVG4DAQTUjneajBZeUGOBX2TwF0Dc59ILFYO7emNUlRt62iIBriiUlS1OS-OwSIi4LDNMjvnITkRjb5Kj8dzPyMlaIiVUkdTc9YylHf34ERyZPtk5vzvpiR8InHYTq93_M">
+</div>
+<div class="flex-1">
+<div class="flex items-baseline gap-sm mb-1">
+<span class="font-bold text-on-surface hover:underline cursor-pointer">Alex Morgan</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">09:24 AM</span>
+</div>
+<div class="text-on-surface text-body-sm leading-relaxed">
+                            Agreed. I'm also seeing some latency spikes in the Frankfurt cluster. Is that related to the deployment pipeline bottleneck?
+                        </div>
+<!-- File Attachment Mockup -->
+<div class="mt-md max-w-sm border border-outline-variant rounded-xl p-sm flex items-center gap-md bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer">
+<div class="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center text-error">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="text-on-surface font-label-md text-label-md truncate">latency_report_2023_10_24.pdf</div>
+<div class="text-on-surface-variant font-label-sm text-label-sm uppercase">2.4 MB • PDF</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary">download</span>
+</div>
+</div>
+</div>
+<!-- AI Response Generating State -->
+<div class="flex gap-md opacity-70 italic animate-pulse">
+<div class="w-10 h-10 shrink-0 bg-primary-container/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div class="flex-1 self-center">
+<span class="font-label-md text-label-md">Marshal is analyzing metrics...</span>
+</div>
+</div>
+</div>
+<!-- Message Input Field -->
+<footer class="p-lg pt-0">
+<div class="bg-surface-container-high border border-outline-variant rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary transition-all duration-200">
+<div class="flex items-center px-md py-sm border-b border-outline-variant/30 gap-md bg-surface-container-highest/50">
+<button class="hover:text-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">format_bold</span></button>
+<button class="hover:text-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">format_italic</span></button>
+<button class="hover:text-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">link</span></button>
+<div class="h-4 w-px bg-outline-variant"></div>
+<button class="hover:text-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">format_list_bulleted</span></button>
+<button class="hover:text-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">code</span></button>
+</div>
+<div class="p-md flex items-end gap-md">
+<div class="flex-1 min-h-[44px]">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline font-body-sm resize-none p-0 max-h-48 overflow-y-auto" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'" placeholder="Message #general" rows="1"></textarea>
+</div>
+<div class="flex items-center gap-sm shrink-0 mb-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-highest text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[22px]">add_circle</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-highest text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[22px]">mood</span>
+</button>
+<button class="bg-primary-container text-on-primary-container w-8 h-8 flex items-center justify-center rounded-lg hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-sm px-1">
+<div class="flex items-center gap-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] font-label-sm text-outline uppercase tracking-widest">Team latency: 12ms • All systems nominal</span>
+</div>
+<div class="flex items-center gap-xs text-[10px] text-outline font-label-sm">
+<span class="font-bold">Enter</span> to send • <span class="font-bold">Shift+Enter</span> for new line
+                    </div>
+</div>
+</footer>
+</main>
+</div>
+<!-- Responsive Navigation for Mobile (Shared Component Logic) -->
+<nav class="md:hidden flex h-16 w-full items-center justify-around bg-surface border-t border-outline-variant dark:border-outline-variant px-md shrink-0">
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-label-sm">Dashboard</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="text-[10px] font-label-sm">Pulse</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" data-icon="chat" style="font-variation-settings: 'FILL' 1;">chat</span>
+<span class="text-[10px] font-label-sm font-bold">Chat</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="text-[10px] font-label-sm">Marshal</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="text-[10px] font-label-sm">Hub</span>
+</div>
+</nav>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('.cursor-pointer').forEach(el => {
+            el.addEventListener('click', () => {
+                console.log('Action triggered on:', el.innerText || 'Element');
+            });
+        });
+
+        // Auto-focus the input
+        window.addEventListener('load', () => {
+            const textarea = document.querySelector('textarea');
+            if (textarea) textarea.focus();
+        });
+    </script>
+
+
+</body></html>

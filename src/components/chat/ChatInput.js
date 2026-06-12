@@ -20,10 +20,63 @@ import Reanimated, {
   FadeIn,
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Svg, { Circle } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 
 const AnimatedPressable = Reanimated.createAnimatedComponent(Pressable);
+
+// Hollow ring that fills up clockwise based on usage (0..1).
+function UsageRing({ pct, COLORS }) {
+  const size = 20;
+  const stroke = 2.5;
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const filled = Math.min(Math.max(pct, 0), 1);
+  const dash = circ * filled;
+  return (
+    <Svg width={size} height={size}>
+      <Circle
+        cx={size / 2} cy={size / 2} r={r}
+        stroke={`${COLORS.onSurfaceVariant}33`} strokeWidth={stroke} fill="none"
+      />
+      {filled > 0 && (
+        <Circle
+          cx={size / 2} cy={size / 2} r={r}
+          stroke={COLORS.primary} strokeWidth={stroke} fill="none"
+          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      )}
+    </Svg>
+  );
+}
+
+// Fast vs Thinking selector for the Bug model: Fast = quickest answer,
+// Thinking = best answer (Bug consults several models and synthesizes).
+function ModeToggle({ mode, setMode, styles, COLORS }) {
+  const Btn = ({ value, icon, label }) => {
+    const active = mode === value;
+    return (
+      <TouchableOpacity
+        style={[styles.modeBtn, active && styles.modeBtnActive]}
+        onPress={() => setMode(value)}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name={icon} size={13} color={active ? COLORS.onPrimary : COLORS.onSurfaceVariant} />
+        <Text style={[styles.modeText, active && styles.modeTextActive]}>{label}</Text>
+      </TouchableOpacity>
+    );
+  };
+  return (
+    <Reanimated.View entering={FadeIn.duration(200)} style={styles.modeRow}>
+      <View style={styles.modeToggle}>
+        <Btn value="fast" icon="lightning-bolt" label="Fast" />
+        <Btn value="thinking" icon="brain" label="Thinking" />
+      </View>
+    </Reanimated.View>
+  );
+}
 
 function SendButton({ active, loading, onPress, styles, COLORS }) {
   const scale = useSharedValue(1);
@@ -73,7 +126,12 @@ export default function ChatInput({
   handleSend,
   loading,
   pickDocument,
-  MODELS
+  MODELS,
+  usage = {},
+  usageLimit = null,
+  mode = 'fast',
+  setMode = () => {},
+  isBugSelected = false
 }) {
   const { COLORS } = useTheme();
   const styles = getStyles(COLORS);
@@ -89,23 +147,43 @@ export default function ChatInput({
             </TouchableWithoutFeedback>
             <Animated.View style={[styles.modelDropdown, { opacity: dropdownAnim, transform: [{ translateY: dropdownAnim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }]}>
               <ScrollView style={styles.modelDropdownScroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                {MODELS.free.map((model) => (
-                  <TouchableOpacity 
-                    key={model.id}
-                    style={[styles.modelDropdownItem, selectedModel.id === model.id && styles.modelDropdownItemActive]}
-                    onPress={() => {
-                      setSelectedModel(model);
-                      toggleModelSelector();
-                    }}
-                  >
-                    <Text style={[styles.modelDropdownItemText, selectedModel.id === model.id && styles.modelDropdownItemTextActive]}>
-                      {model.name}
-                    </Text>
-                    {selectedModel.id === model.id && (
-                       <MaterialCommunityIcons name="check" size={14} color={COLORS.primary} />
-                    )}
-                  </TouchableOpacity>
-                ))}
+                {(() => {
+                  // Fill against the real OpenRouter daily cap when known; otherwise
+                  // fall back to a relative gauge (share of the busiest model).
+                  const maxUsed = Math.max(1, ...MODELS.free.map((m) => usage[m.id] || 0));
+                  const denom = usageLimit && usageLimit > 0 ? usageLimit : maxUsed;
+                  return MODELS.free.map((model) => {
+                    const used = usage[model.id] || 0;
+                    const isBug = model.locked || model.id === 'bug/auto';
+                    return (
+                      <TouchableOpacity
+                        key={model.id}
+                        style={[styles.modelDropdownItem, selectedModel.id === model.id && styles.modelDropdownItemActive]}
+                        onPress={() => {
+                          setSelectedModel(model);
+                          toggleModelSelector();
+                        }}
+                      >
+                        {isBug && <MaterialCommunityIcons name="bug" size={16} color={COLORS.primary} />}
+                        <Text
+                          style={[styles.modelDropdownItemText, selectedModel.id === model.id && styles.modelDropdownItemTextActive]}
+                          numberOfLines={1}
+                        >
+                          {model.name}
+                        </Text>
+                        {isBug && (
+                          <View style={styles.smartBadge}>
+                            <Text style={styles.smartBadgeText}>SMART</Text>
+                          </View>
+                        )}
+                        {selectedModel.id === model.id && (
+                           <MaterialCommunityIcons name="check" size={14} color={COLORS.primary} />
+                        )}
+                        <UsageRing pct={used / denom} COLORS={COLORS} />
+                      </TouchableOpacity>
+                    );
+                  });
+                })()}
               </ScrollView>
             </Animated.View>
           </>
@@ -126,6 +204,8 @@ export default function ChatInput({
             ))}
           </View>
         )}
+
+        {isBugSelected && <ModeToggle mode={mode} setMode={setMode} styles={styles} COLORS={COLORS} />}
 
         <View style={[styles.inputBox, isInputFocused && styles.inputBoxFocused]}>
           <TextInput
@@ -236,8 +316,18 @@ const getStyles = (COLORS) => StyleSheet.create({
     zIndex: 100
   },
   modelDropdownScroll: { maxHeight: 200 },
-  modelDropdownItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: SPACING.sm, paddingHorizontal: SPACING.md, borderRadius: ROUNDED.md, marginBottom: 2 },
+  modelDropdownItem: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, paddingVertical: SPACING.sm, paddingHorizontal: SPACING.sm, borderRadius: ROUNDED.md, marginBottom: 2 },
   modelDropdownItemActive: { backgroundColor: `${COLORS.primary}1A` },
-  modelDropdownItemText: { ...TYPOGRAPHY.bodyMd, color: COLORS.onSurface },
+  modelDropdownItemText: { ...TYPOGRAPHY.bodyMd, color: COLORS.onSurface, flex: 1 },
   modelDropdownItemTextActive: { color: COLORS.primary, fontWeight: 'bold' },
+  smartBadge: { backgroundColor: `${COLORS.primary}1A`, borderRadius: ROUNDED.full, paddingHorizontal: 6, paddingVertical: 2 },
+  smartBadgeText: { ...TYPOGRAPHY.labelSm, fontSize: 9, fontWeight: '800', color: COLORS.primary, letterSpacing: 0.5 },
+
+  // Bug Fast/Thinking selector
+  modeRow: { flexDirection: 'row', justifyContent: 'flex-start', marginBottom: SPACING.xs, marginLeft: 4 },
+  modeToggle: { flexDirection: 'row', backgroundColor: COLORS.surfaceContainerHighest, borderRadius: ROUNDED.full, padding: 2 },
+  modeBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: ROUNDED.full },
+  modeBtnActive: { backgroundColor: COLORS.primary },
+  modeText: { ...TYPOGRAPHY.labelSm, fontSize: 11, fontWeight: '700', color: COLORS.onSurfaceVariant },
+  modeTextActive: { color: COLORS.onPrimary },
 });

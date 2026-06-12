@@ -37,6 +37,11 @@ export default function VerifyScreen() {
   };
 
   const handleVerify = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Email address is missing. Please try signing up again.');
+      return;
+    }
+
     const otpCode = otp.join('');
     if (otpCode.length !== 6) {
       Alert.alert('Error', 'Please enter a 6-digit code');

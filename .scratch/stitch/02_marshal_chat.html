@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Marshal GM - Team Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#dee3e9",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "surface-container-highest": "#30353a",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container-high": "#252b2f",
+                    "on-tertiary-fixed": "#2c1600",
+                    "surface-variant": "#30353a",
+                    "surface-container-lowest": "#0a0f13",
+                    "primary-container": "#0ea5e9",
+                    "tertiary-fixed-dim": "#ffb86e",
+                    "primary-fixed-dim": "#89ceff",
+                    "tertiary-container": "#de8712",
+                    "inverse-on-surface": "#2c3135",
+                    "primary": "#89ceff",
+                    "on-error": "#690005",
+                    "on-primary": "#00344d",
+                    "surface": "#0f1418",
+                    "surface-container": "#1b2024",
+                    "on-error-container": "#ffdad6",
+                    "tertiary": "#ffb86e",
+                    "surface-bright": "#353a3e",
+                    "on-secondary": "#213145",
+                    "background": "#0f1418",
+                    "primary-fixed": "#c9e6ff",
+                    "secondary": "#b7c8e1",
+                    "on-secondary-container": "#a9bad3",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-background": "#dee3e9",
+                    "on-surface-variant": "#bec8d2",
+                    "surface-tint": "#89ceff",
+                    "on-tertiary": "#492900",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#ffdcbd",
+                    "outline-variant": "#3e4850",
+                    "surface-container-low": "#171c20",
+                    "on-tertiary-container": "#4d2b00",
+                    "outline": "#88929b",
+                    "on-surface": "#dee3e9",
+                    "on-primary-fixed": "#001e2f",
+                    "on-secondary-fixed": "#0b1c30",
+                    "on-primary-container": "#003751",
+                    "error": "#ffb4ab",
+                    "secondary-container": "#3a4a5f",
+                    "on-tertiary-fixed-variant": "#693c00",
+                    "inverse-primary": "#006591",
+                    "on-primary-fixed-variant": "#004c6e",
+                    "surface-dim": "#0f1418"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "base": "4px",
+                    "margin-desktop": "32px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "xl": "40px",
+                    "margin-mobile": "16px",
+                    "max-width": "1440px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["JetBrains Mono"],
+                    "label-md": ["JetBrains Mono"],
+                    "display": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                    "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .message-stream::-webkit-scrollbar {
+            width: 4px;
+        }
+        .message-stream::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .message-stream::-webkit-scrollbar-thumb {
+            background: #3e4850;
+            border-radius: 10px;
+        }
+        .ai-border-gradient {
+            border: 1px solid transparent;
+            background: linear-gradient(#1b2024, #1b2024) padding-box,
+                        linear-gradient(to right, #89ceff, #0ea5e9) border-box;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<!-- Navigation Drawer -->
+<aside class="flex flex-col h-screen fixed left-0 top-0 z-40 bg-surface-container dark:bg-surface-container h-full w-64 border-r border-outline-variant">
+<div class="p-md flex items-center gap-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary">BUG.</span>
+</div>
+<nav class="flex-1 px-sm py-md space-y-base">
+<div class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-md text-body-md">Pulse</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-body-md text-body-md">Tally</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+<span class="font-body-md text-body-md">Team Chat</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-bold rounded-lg duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-body-md text-body-md">Marshal Chat</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out cursor-pointer">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="font-body-md text-body-md">Agents Hub</span>
+</div>
+</nav>
+<div class="p-md border-t border-outline-variant">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="Alex Morgan" class="w-full h-full object-cover" data-alt="A professional headshot of a woman with short dark hair, wearing a modern business-casual outfit, against a clean studio background with soft sky-blue lighting to match a technical, efficient corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1IIEW4qxSKFbrscLKIksyTAzz4ZM8Dcr3W8_dP0mqw8CWSXqq1sW_0dJiob9BVvGMdx757y6LUfA5pQuEqatWMFm5t29p2Gz737umgoA-O-H1krUTyWX_PDmFXBh11ngcSqC0ExZ-ZjhEgv2lvbSOaR5ErsHwzpI-0YtRjV06z1NW_5plGHiGPAsWKO-kG-ANymeItiQn_nyKEGoxxwb4ORlxhXj0BQQ2jJg_Eg4VZOKR2VR05Ofn4YPKwESozoHJEMi1pIdB9_s"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-bold text-on-surface">Alex Morgan</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Operations Lead</span>
+</div>
+</div>
+<div class="mt-md text-on-surface-variant font-label-sm text-label-sm hover:text-primary transition-colors cursor-pointer">
+                Settings &amp; Logout
+            </div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 w-[calc(100%-16rem)] h-screen flex flex-col relative">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-md w-full h-16 bg-surface dark:bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary scale-95 transition-transform" data-icon="menu">menu</button>
+<h1 class="font-headline-md text-headline-md text-on-surface">Marshal GM</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm bg-surface-container-low px-sm py-1 rounded-full border border-outline-variant">
+<div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Team Online: 12</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors" data-icon="dark_mode">dark_mode</button>
+</div>
+</header>
+<!-- Chat Container -->
+<div class="flex-1 overflow-y-auto message-stream bg-background scroll-smooth p-lg">
+<div class="max-w-4xl mx-auto space-y-xl py-lg">
+<!-- System Time -->
+<div class="flex justify-center">
+<span class="font-label-sm text-label-sm text-outline px-md py-1 bg-surface-container rounded-full uppercase tracking-widest">Tuesday, Oct 24</span>
+</div>
+<!-- AI Message: Insight -->
+<div class="flex flex-col items-start gap-md group">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]" data-icon="smart_toy">smart_toy</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-primary">Marshal GM</span>
+<span class="font-label-sm text-label-sm text-outline">10:04 AM</span>
+</div>
+<div class="ai-border-gradient p-md rounded-xl max-w-[85%] shadow-lg">
+<div class="space-y-md">
+<p class="font-body-md text-body-md text-on-surface">Good morning, Team. I've finished the overnight analysis of the logistics pipelines. We have a projected bottleneck at the <strong>Berlin Hub</strong> starting Thursday. </p>
+<div class="bg-surface-container-high rounded-lg p-md border border-outline-variant">
+<p class="font-label-sm text-label-sm text-primary mb-sm uppercase tracking-tighter">Recommended Action</p>
+<ul class="list-disc list-inside font-body-sm text-body-sm text-on-surface-variant space-y-base">
+<li>Reroute 15% of non-priority traffic to Prague</li>
+<li>Activate secondary freight contracts for Zone B</li>
+<li>Notify local staff for triple-shift overlap</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-md group">
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-outline">10:07 AM</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Alex Morgan</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Alex" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0xVqnZLFpyuy_Ogh08nQn-WWakYo0HZt8kJC40Mgw87JeNdRGkyaH8Yk0I1Cu6ATlU1J_MWfeXmIO7-WVVtvUQlZ707KlIw0Xe5c4VXhbk-wYL1Udm-6mSQn9QkSLG6uY7qhqv-AVdZZ5Ke_t-8-HpTqwg1PX0zGDnY2Ry0heINc3arnWdGA9S1eG4WISDkLZuP1N6jv44f8qNqd0Tv2EVv-_FQCyDLWYpRWFjmXlHEeuqldpbW4eTM7eOxAwNf_CpshhjDehaHQ"/>
+</div>
+</div>
+<div class="bg-secondary-container p-md rounded-xl max-w-[85%] border border-outline-variant">
+<p class="font-body-md text-body-md text-on-secondary-container">Understood, Marshal. Can you pull the latest throughput code from the Berlin tracker so Sarah can review the logic?</p>
+</div>
+</div>
+<!-- AI Message: Code Block -->
+<div class="flex flex-col items-start gap-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]" data-icon="smart_toy">smart_toy</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-primary">Marshal GM</span>
+<span class="font-label-sm text-label-sm text-outline">10:08 AM</span>
+</div>
+<div class="ai-border-gradient p-md rounded-xl max-w-[85%] w-full shadow-lg">
+<p class="font-body-md text-body-md text-on-surface mb-md">Certainly. Here is the logic snippet handling the current load-balancing for the Berlin instance:</p>
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden border border-outline-variant">
+<div class="flex items-center justify-between px-md py-sm bg-surface-container-high border-b border-outline-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">load_balancer.py</span>
+<span class="material-symbols-outlined text-outline text-sm cursor-pointer hover:text-primary transition-colors" data-icon="content_copy">content_copy</span>
+</div>
+<pre class="p-md font-label-md text-label-md text-primary overflow-x-auto"><code>def calculate_load_threshold(hub_id):
+    current_load = db.get_active_shipments(hub_id)
+    capacity = db.get_hub_capacity(hub_id)
+    
+    if (current_load / capacity) &gt; 0.85:
+        return trigger_reroute_protocol(
+            target="PRG_HUB", 
+            volume=0.15
+        )
+    return "STABLE"</code></pre>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-md">
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-outline">10:12 AM</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Sarah Chen</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Sarah" class="w-full h-full object-cover" data-alt="A focused young woman of East Asian descent with glasses, looking at a computer screen which reflects technical data. The image is professional, minimalist, and uses cold-toned studio lighting with deep blacks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcP2mwuLWNsqk_omutGfTSNOeHdDWUhx1WijeYt-8DfjG090bH5hq4rF0glqnOTFiREWA8ORiTBkV3gF82cMXZZ9T3K_MmAz9_5mJ8JrF6OWZyedHib2zlMqOZ0zi6lrWtunmVLwbAc62GyEwW7-8JJWhu6CpEwj4VUeH99NbiMXEk125qIDkQv3kPY7ct8k50t4euAVFXaICJuQ-dj9U97L8QBMr8Szw-WwHyYV1jQxNgLvGbksVbyb1gCz_QTOdMX0G48pqom0A"/>
+</div>
+</div>
+<div class="bg-secondary-container p-md rounded-xl max-w-[85%] border border-outline-variant">
+<p class="font-body-md text-body-md text-on-secondary-container">Thanks, Marshal. I think we should increase the reroute volume to 20% given the current weather trends in Northern Europe.</p>
+</div>
+</div>
+<!-- AI Typing Indicator (Invisible by default, could be toggled with JS) -->
+<div class="hidden flex items-center gap-sm" id="typing-indicator">
+<div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px] animate-pulse" data-icon="more_horiz">more_horiz</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline italic">Marshal is processing...</span>
+</div>
+</div>
+</div>
+<!-- Input Bar (Centered Conversation Flow) -->
+<footer class="w-full bg-surface p-lg border-t border-outline-variant">
+<div class="max-w-4xl mx-auto relative">
+<div class="flex items-end gap-md bg-surface-container p-sm rounded-xl border border-outline focus-within:border-primary transition-colors">
+<button class="material-symbols-outlined p-sm text-on-surface-variant hover:text-primary transition-colors" data-icon="add_circle">add_circle</button>
+<textarea class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline font-body-md py-sm resize-none" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'" placeholder="Message Marshal GM..." rows="1"></textarea>
+<button class="bg-primary text-on-primary p-sm rounded-lg hover:bg-primary-container transition-colors shadow-lg">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+<div class="flex justify-center mt-sm">
+<span class="font-label-sm text-label-sm text-outline">Marshal GM can analyze live data, code, and documentation.</span>
+</div>
+</div>
+</footer>
+<!-- Bottom Navigation (Contextual Settings/Chat only as per JSON for Mobile/Utility) -->
+<div class="fixed bottom-8 right-8 z-50 flex flex-col gap-sm">
+<div class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full w-14 h-14 flex items-center justify-center shadow-xl hover:scale-110 duration-200 transition-transform cursor-pointer">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</div>
+<div class="bg-surface-container text-on-surface-variant rounded-full w-14 h-14 flex items-center justify-center shadow-xl hover:scale-110 duration-200 transition-transform cursor-pointer border border-outline-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interaction for typing simulation
+        const textarea = document.querySelector('textarea');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        textarea.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (this.value.trim() !== "") {
+                    // Logic to clear and show typing would go here
+                    this.value = "";
+                    this.style.height = 'auto';
+                    
+                    typingIndicator.classList.remove('hidden');
+                    setTimeout(() => {
+                        typingIndicator.classList.add('hidden');
+                    }, 2000);
+                }
+            }
+        });
+    </script>
+</body></html>

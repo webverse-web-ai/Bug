@@ -27,7 +27,9 @@ export async function GET(request) {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const url = new URL(request.url);
+    const url = new URL(request.url, 'http://localhost');
+    const page = parseInt(url.searchParams.get('page')) || 1;
+    const limit = parseInt(url.searchParams.get('limit')) || 20;
     const sessionId = url.searchParams.get('sessionId');
 
     let chat;

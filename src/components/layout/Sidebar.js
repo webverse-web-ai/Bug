@@ -201,7 +201,17 @@ export default function Sidebar({
             <MaterialCommunityIcons name="database" size={20} color={COLORS.onSurfaceVariant} />
             <Text style={styles.drawerLinkText}>Knowledge Base</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.drawerLink}>
+          <TouchableOpacity
+            style={styles.drawerLink}
+            onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/oms'); }}
+          >
+            <MaterialCommunityIcons name="pulse" size={20} color={COLORS.onSurfaceVariant} />
+            <Text style={styles.drawerLinkText}>Pulse · Orders</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.drawerLink}
+            onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/metrics'); }}
+          >
             <MaterialCommunityIcons name="chart-line" size={20} color={COLORS.onSurfaceVariant} />
             <Text style={styles.drawerLinkText}>System Metrics</Text>
           </TouchableOpacity>

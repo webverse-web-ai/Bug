@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Platform, TouchableOpacity } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -6,24 +6,75 @@ import Markdown from 'react-native-markdown-display';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 
+// Reveals text progressively when `enabled` so Bug's replies read as typed live,
+// not pasted. Longer messages reveal more chars per tick so they never drag
+// (capped at ~140 ticks ≈ ~1.7s regardless of length).
+function useTypewriter(text, enabled, speed = 12) {
+  const [shown, setShown] = useState(enabled ? '' : text);
+  useEffect(() => {
+    if (!enabled) { setShown(text); return; }
+    setShown('');
+    let i = 0;
+    const step = Math.max(1, Math.ceil(text.length / 140));
+    const id = setInterval(() => {
+      i += step;
+      if (i >= text.length) {
+        setShown(text);
+        clearInterval(id);
+      } else {
+        setShown(text.slice(0, i));
+      }
+    }, speed);
+    return () => clearInterval(id);
+  }, [text, enabled]);
+  return shown;
+}
+
 export default function ChatMessage({ item, user }) {
   const { COLORS } = useTheme();
   const styles = getStyles(COLORS);
   const [copied, setCopied] = useState(false);
 
   const isModel = item.role === 'model';
+  const displayText = useTypewriter(item.text || '', isModel && !!item.typing);
 
   const handleCopy = async () => {
+    const text = item.text || '';
+    let ok = false;
+
+    // Preferred: async Clipboard API (only available in secure contexts / localhost).
     try {
-      if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(item.text || '');
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
       }
-      // Native copy needs `expo-clipboard`; install it to enable copy on iOS/Android.
     } catch (e) {
-      // Clipboard unavailable — ignore.
+      ok = false;
     }
+
+    // Fallback for non-secure contexts (e.g. served over a LAN IP).
+    if (!ok && Platform.OS === 'web' && typeof document !== 'undefined') {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) {
+        ok = false;
+      }
+    }
+
+    // Show the "Copied" confirmation when it worked.
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+    // Native (iOS/Android) needs `expo-clipboard`; install it to enable copy there.
   };
 
   if (isModel) {
@@ -36,7 +87,7 @@ export default function ChatMessage({ item, user }) {
           <Text style={styles.modelHeaderName}>BUG CEO AGENT</Text>
         </View>
         <View style={styles.messageContentModel}>
-          <Markdown style={styles.markdownStyles}>{item.text}</Markdown>
+          <Markdown style={styles.markdownStyles}>{displayText}</Markdown>
         </View>
         <TouchableOpacity style={styles.copyButton} onPress={handleCopy} hitSlop={8} activeOpacity={0.7}>
           <MaterialCommunityIcons

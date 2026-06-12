@@ -54,14 +54,15 @@ export async function POST(request) {
     let user = await User.findOne({ email: userInfo.email });
 
     if (user) {
-      // If the user already exists, we log them in and ensure they are marked as verified.
-      // We don't overwrite their local password if they have one.
-      user.isVerified = true;
+      // Existing user: log them in and ensure they are marked verified.
+      // Don't overwrite a local password.
+      const updates = { isVerified: true };
       if (!user.providerId && user.authProvider !== 'local') {
-        user.authProvider = provider;
-        user.providerId = userInfo.providerId;
+        updates.authProvider = provider;
+        updates.providerId = userInfo.providerId;
       }
-      await user.save();
+      await User.update(user._id, updates);
+      user = { ...user, ...updates };
     } else {
       // Create new user
       user = await User.create({

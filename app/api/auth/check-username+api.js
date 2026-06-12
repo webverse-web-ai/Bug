@@ -3,7 +3,7 @@ import User from '@/server/models/User';
 
 export async function GET(request) {
   try {
-    const url = new URL(request.url);
+    const url = new URL(request.url, 'http://localhost');
     const username = url.searchParams.get('username');
 
     if (!username || username.trim().length < 3) {

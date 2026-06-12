@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bug BOS Chat Interface</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Minimalist Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #3e4850; /* outline-variant */
+            border-radius: 10px;
+        }
+        
+        textarea:focus {
+            outline: none;
+        }
+    </style>
+<!-- Tailwind Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#3a4a5f",
+                        "on-primary": "#00344d",
+                        "surface-bright": "#353a3e",
+                        "error": "#ffb4ab",
+                        "on-surface": "#dee3e9",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary": "#492900",
+                        "on-secondary": "#213145",
+                        "tertiary-fixed": "#ffdcbd",
+                        "surface-tint": "#89ceff",
+                        "surface-container-highest": "#30353a",
+                        "on-surface-variant": "#bec8d2",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#0f1418",
+                        "primary-fixed-dim": "#89ceff",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface": "#0f1418",
+                        "on-tertiary-fixed": "#2c1600",
+                        "on-primary-fixed": "#001e2f",
+                        "primary-fixed": "#c9e6ff",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#2c3135",
+                        "tertiary-container": "#de8712",
+                        "secondary": "#b7c8e1",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "on-background": "#dee3e9",
+                        "outline": "#88929b",
+                        "on-secondary-container": "#a9bad3",
+                        "surface-container-low": "#171c20",
+                        "surface-variant": "#30353a",
+                        "inverse-primary": "#006591",
+                        "surface-container": "#1b2024",
+                        "outline-variant": "#3e4850",
+                        "tertiary": "#ffb86e",
+                        "on-tertiary-container": "#4d2b00",
+                        "primary": "#89ceff",
+                        "on-tertiary-fixed-variant": "#693c00",
+                        "on-primary-container": "#003751",
+                        "on-error": "#690005",
+                        "background": "#0f1418",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary-fixed-dim": "#ffb86e",
+                        "primary-container": "#0ea5e9",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "surface-container-high": "#252b2f",
+                        "inverse-surface": "#dee3e9",
+                        "surface-container-lowest": "#0a0f13"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "max-width": "1440px",
+                        "xl": "40px",
+                        "margin-desktop": "32px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md h-screen flex overflow-hidden antialiased">
+<!-- Navigation Drawer -->
+<aside class="h-full w-64 fixed left-0 top-0 flex flex-col py-lg bg-surface-container-low border-r border-outline-variant z-20">
+<!-- Brand / Header -->
+<div class="px-md pb-xl flex items-center gap-sm">
+<img alt="Bug Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLv4mNj1Ls_Lin1ipmRccQZgK9SDTv84Pj2jdFRsgxqLesb0tpNg7ooPR-4OfCmi6p6Ui_t2YNZmeUZEmNNabbZveY3o1q3eUD5Lqtk5jonVtgp53NSxX-PrHj5z4oOH8nQ4I1irVcfbaKXSPQNJuyr5Ui_lZJCm2saFENhVDuDGNk9-JK0Yf-MlYHInhGqD1Hth-fcJW--5i1RFxV9uDsFMqjNuN_ns4OCFLPXm001eAOUFzTAy1G5jaQ"/>
+<h1 class="font-headline-lg text-headline-lg font-bold tracking-tighter text-primary">BUG BOS</h1>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-1 px-sm">
+<!-- Active Item -->
+<a class="flex items-center gap-md bg-secondary-container text-on-secondary-container rounded-lg px-md py-sm opacity-80 duration-150" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-md text-label-md">Chat Sessions</span>
+</a>
+<!-- Inactive Items -->
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-md text-label-md">Knowledge Base</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-md text-label-md">System Metrics</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-md py-sm hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-64 flex-1 flex flex-col h-full relative bg-surface">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-lg h-16 bg-surface border-b border-outline-variant sticky top-0 z-10 docked full-width">
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-100 flex items-center justify-center">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="font-headline-md text-headline-md font-extrabold text-on-surface">New Operation</h2>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-100 flex items-center justify-center">
+<span class="material-symbols-outlined">settings_input_component</span>
+</button>
+</header>
+<!-- Chat Canvas -->
+<div class="flex-1 overflow-y-auto px-xl py-xl pb-40 flex flex-col items-center">
+<div class="w-full max-w-3xl flex flex-col gap-xl">
+<!-- Initial Welcome -->
+<div class="flex flex-col items-center justify-center py-xl text-center gap-md">
+<img alt="Bug Logo Minimal" class="w-16 h-16 object-contain opacity-50" src="https://lh3.googleusercontent.com/aida/AP1WRLv4mNj1Ls_Lin1ipmRccQZgK9SDTv84Pj2jdFRsgxqLesb0tpNg7ooPR-4OfCmi6p6Ui_t2YNZmeUZEmNNabbZveY3o1q3eUD5Lqtk5jonVtgp53NSxX-PrHj5z4oOH8nQ4I1irVcfbaKXSPQNJuyr5Ui_lZJCm2saFENhVDuDGNk9-JK0Yf-MlYHInhGqD1Hth-fcJW--5i1RFxV9uDsFMqjNuN_ns4OCFLPXm001eAOUFzTAy1G5jaQ"/>
+<h3 class="font-headline-lg text-headline-lg text-on-surface-variant">How can I help you today?</h3>
+</div>
+<!-- User Message -->
+<div class="flex gap-lg group">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0 mt-1">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">person</span>
+</div>
+<div class="flex-1">
+<div class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            Pull the latest anomaly reports from the primary database cluster and summarize any critical warnings from the past 12 hours.
+                        </div>
+</div>
+</div>
+<!-- AI Response -->
+<div class="flex gap-lg group">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0 mt-1">
+<img alt="AI Avatar" class="w-5 h-5 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLv4mNj1Ls_Lin1ipmRccQZgK9SDTv84Pj2jdFRsgxqLesb0tpNg7ooPR-4OfCmi6p6Ui_t2YNZmeUZEmNNabbZveY3o1q3eUD5Lqtk5jonVtgp53NSxX-PrHj5z4oOH8nQ4I1irVcfbaKXSPQNJuyr5Ui_lZJCm2saFENhVDuDGNk9-JK0Yf-MlYHInhGqD1Hth-fcJW--5i1RFxV9uDsFMqjNuN_ns4OCFLPXm001eAOUFzTAy1G5jaQ"/>
+</div>
+<div class="flex-1 flex flex-col gap-md">
+<div class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            I've scanned the primary database cluster logs for the past 12 hours. There are two critical anomalies detected in the query latency metrics.
+                        </div>
+<!-- Data Card / Snippet -->
+<div class="bg-surface-container rounded-lg border border-outline-variant p-md flex flex-col gap-sm">
+<div class="flex items-center gap-sm text-on-surface-variant mb-1">
+<span class="material-symbols-outlined text-[16px]">database</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Cluster Alpha-01</span>
+</div>
+<div class="font-label-md text-label-md text-on-surface font-mono bg-surface-dim p-sm rounded border border-outline-variant/50">
+                                &gt; WARN [08:42:11] Latency spike &gt; 500ms on table `user_transactions`<br/>
+                                &gt; CRIT [09:15:00] Connection pool exhausted
+                            </div>
+</div>
+<div class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            The connection pool exhaustion aligns with the scheduled backup routine. Would you like me to generate an optimized index proposal to mitigate the `user_transactions` latency?
+                        </div>
+<!-- AI Actions -->
+<div class="flex items-center gap-sm mt-sm">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span class="font-label-sm text-label-sm">Copy Report</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">thumb_down</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Command Bar (Fixed Bottom) -->
+<div class="absolute bottom-0 left-0 w-full px-xl pb-lg pt-16 bg-gradient-to-t from-surface via-surface to-transparent pointer-events-none flex justify-center">
+<div class="w-full max-w-3xl bg-surface-container border border-outline-variant rounded-xl p-2 flex flex-col gap-1 pointer-events-auto shadow-lg shadow-black/40 ring-1 ring-white/5">
+<!-- Text Input -->
+<div class="relative w-full">
+<textarea class="w-full bg-transparent border-none focus:ring-0 resize-none font-body-md text-body-md text-on-surface placeholder-on-surface-variant p-sm min-h-[52px] max-h-[200px]" placeholder="Ask anything or type '/' for commands..." rows="1"></textarea>
+</div>
+<!-- Toolbar -->
+<div class="flex items-center justify-between px-2 pb-1">
+<div class="flex items-center gap-2">
+<!-- Attachment Button -->
+<button class="p-1.5 rounded-md hover:bg-surface-variant text-on-surface-variant transition-colors group relative" title="Upload files">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">add_circle</span>
+</button>
+<!-- Model Switcher -->
+<button class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-surface-container-high border border-outline-variant/50 hover:bg-surface-variant transition-colors text-on-surface-variant group">
+<span class="material-symbols-outlined text-[16px] text-primary">memory</span>
+<span class="font-label-sm text-label-sm">Bug-1 Pro</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-y-px transition-transform">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Submit Button -->
+<button class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+<span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

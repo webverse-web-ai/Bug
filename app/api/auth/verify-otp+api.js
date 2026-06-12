@@ -20,7 +20,7 @@ export async function POST(request) {
     const otpRecord = await OTP.findOne({ email, otp });
 
     if (!otpRecord) {
-      return Response.json({ error: 'OTP expired, not found, or invalid' }, { status: 400 });
+      return Response.json({ error: "Code doesn't match or code expired" }, { status: 400 });
     }
 
     // OTP is valid! Find user and mark as verified
