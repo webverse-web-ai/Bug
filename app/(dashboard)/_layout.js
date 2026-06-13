@@ -1,7 +1,8 @@
 import { Stack, Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import Loader from '@/components/ui/Loader';
 
 export default function DashboardLayout() {
   const { user, loading } = useAuth();
@@ -10,7 +11,7 @@ export default function DashboardLayout() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background }}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Loader size={52} label="Loading Bug…" />
       </View>
     );
   }
@@ -18,6 +19,13 @@ export default function DashboardLayout() {
   // Redirect to login if user is not authenticated
   if (!user) {
     return <Redirect href="/auth/login" />;
+  }
+
+  // Team workspace is mandatory: send unfinished users to setup until they have
+  // a personal username AND an approved team membership.
+  const onboarded = user.username && user.team && user.team.myStatus === 'approved';
+  if (!onboarded) {
+    return <Redirect href="/setup" />;
   }
 
   return (

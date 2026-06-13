@@ -12,9 +12,10 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
+import { SkeletonCard } from '@/components/ui/Skeleton';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 import DashboardShell from '@/components/layout/DashboardShell';
-import { getFreeModels, getSelectedModels, saveSelectedModels, getUsage } from '@/client/api';
+import { getFreeModels, getGeminiModels, getSelectedModels, saveSelectedModels, getUsage } from '@/client/api';
 import { isBugId } from '@/server/lib/bugModel';
 
 const MAX_MODELS = 5;
@@ -34,6 +35,7 @@ function MetricsBody() {
   const styles = getStyles(COLORS);
 
   const [allModels, setAllModels] = useState([]);
+  const [geminiModels, setGeminiModels] = useState([]);
   const [selected, setSelected] = useState([]);
   const [usage, setUsage] = useState({ counts: {}, totalToday: 0, resetAt: null, openrouter: null });
   const [search, setSearch] = useState('');
@@ -52,12 +54,14 @@ function MetricsBody() {
   const loadAll = async () => {
     try {
       setLoading(true);
-      const [models, sel, use] = await Promise.all([
+      const [models, gem, sel, use] = await Promise.all([
         getFreeModels().catch(() => []),
+        getGeminiModels().catch(() => ({ models: [] })),
         getSelectedModels().catch(() => []),
         getUsage().catch(() => ({ counts: {}, totalToday: 0, resetAt: null, openrouter: null })),
       ]);
       setAllModels(models);
+      setGeminiModels(gem.models || []);
       setSelected(sel);
       setUsage(use);
       setError('');
@@ -115,9 +119,12 @@ function MetricsBody() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Text style={styles.pageTitle}>System Metrics</Text>
+        <Text style={styles.pageSubtitle}>Pick your chat models and monitor live usage.</Text>
+        <SkeletonCard rows={4} />
+        <SkeletonCard rows={5} />
+      </ScrollView>
     );
   }
 
@@ -154,6 +161,29 @@ function MetricsBody() {
           })}
         </View>
       </Animated.View>
+
+      {/* Google Gemini models — only shown when the account is connected */}
+      {geminiModels.length > 0 && (
+        <Animated.View entering={FadeInDown.duration(290)} style={styles.card}>
+          <View style={styles.cardHeaderRow}>
+            <Text style={styles.cardTitle}>Google Gemini Models</Text>
+            <View style={styles.geminiBadge}><MaterialCommunityIcons name="star-four-points" size={12} color={COLORS.primary} /><Text style={styles.geminiBadgeText}>Connected</Text></View>
+          </View>
+          <Text style={styles.cardHint}>Add Gemini models to your chat picker — they answer directly via your connected Google account.</Text>
+          {geminiModels.map((m) => {
+            const active = selectedIds.has(m.id);
+            return (
+              <TouchableOpacity key={m.id} style={[styles.modelRow, active && styles.modelRowActive]} onPress={() => toggleModel(m)} activeOpacity={0.7}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.modelName} numberOfLines={1}>{m.name}</Text>
+                  <Text style={styles.modelId} numberOfLines={1}>{m.id}</Text>
+                </View>
+                <MaterialCommunityIcons name={active ? 'check-circle' : 'plus-circle-outline'} size={22} color={active ? COLORS.primary : COLORS.onSurfaceVariant} />
+              </TouchableOpacity>
+            );
+          })}
+        </Animated.View>
+      )}
 
       {/* Search + add models */}
       <Animated.View entering={FadeInDown.duration(300)} style={styles.card}>
@@ -299,6 +329,8 @@ const getStyles = (COLORS) => StyleSheet.create({
     paddingHorizontal: SPACING.md, paddingVertical: 7, borderRadius: ROUNDED.full, maxWidth: 220,
   },
   chipLocked: { backgroundColor: `${COLORS.primary}26`, borderColor: `${COLORS.primary}66` },
+  geminiBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: `${COLORS.primary}1A`, paddingHorizontal: SPACING.sm, paddingVertical: 3, borderRadius: ROUNDED.full },
+  geminiBadgeText: { ...TYPOGRAPHY.labelSm, color: COLORS.primary, fontWeight: '700' },
   chipText: { ...TYPOGRAPHY.labelMd, color: COLORS.primary, fontWeight: '600', flexShrink: 1 },
 
   searchRow: {

@@ -31,6 +31,7 @@ import Reanimated, {
 import { COLORS, TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 
 import * as SecureStore from 'expo-secure-store';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import * as DocumentPicker from 'expo-document-picker';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -505,20 +506,35 @@ export default function ChatInterface({ sessionId, onChatUpdated }) {
         />
       )}
 
-      {/* Empty new-chat greeting — disappears once the first message is sent */}
+      {/* Empty new-chat greeting — disappears once the first message is sent.
+          When no AI is connected, prompt the user to power up Bug instead. */}
       {historyLoaded && messages.length === 0 && !loading && (
-        <Reanimated.View
-          entering={FadeIn.duration(400)}
-          exiting={FadeOut.duration(250)}
-          style={styles.emptyGreeting}
-          pointerEvents="none"
-        >
-          <View style={styles.emptyGreetingIcon}>
-            <MaterialCommunityIcons name="bug" size={40} color={COLORS.primary} />
-          </View>
-          <Text style={styles.emptyGreetingTitle}>Hey buddy, I'm Bug</Text>
-          <Text style={styles.emptyGreetingSub}>Ask me anything to get started.</Text>
-        </Reanimated.View>
+        (!user?.hasGeminiToken && !user?.hasOpenRouterKey) ? (
+          <Reanimated.View entering={FadeIn.duration(400)} style={styles.emptyGreeting}>
+            <View style={styles.emptyGreetingIcon}>
+              <MaterialCommunityIcons name="flash-outline" size={40} color={COLORS.primary} />
+            </View>
+            <Text style={styles.emptyGreetingTitle}>Connect AI to power up Bug</Text>
+            <Text style={styles.emptyGreetingSub}>Bug needs a Gemini or OpenRouter connection to chat. It only takes a moment.</Text>
+            <TouchableOpacity style={styles.connectBtn} onPress={() => router.push('/setup')} activeOpacity={0.85}>
+              <MaterialCommunityIcons name="creation" size={18} color={COLORS.onPrimary} />
+              <Text style={styles.connectBtnText}>Connect AI</Text>
+            </TouchableOpacity>
+          </Reanimated.View>
+        ) : (
+          <Reanimated.View
+            entering={FadeIn.duration(400)}
+            exiting={FadeOut.duration(250)}
+            style={styles.emptyGreeting}
+            pointerEvents="none"
+          >
+            <View style={styles.emptyGreetingIcon}>
+              <MaterialCommunityIcons name="bug" size={40} color={COLORS.primary} />
+            </View>
+            <Text style={styles.emptyGreetingTitle}>Hey buddy, I'm Bug</Text>
+            <Text style={styles.emptyGreetingSub}>Ask me anything to get started.</Text>
+          </Reanimated.View>
+        )
       )}
 
       {showScrollDown && (
@@ -578,6 +594,8 @@ const getStyles = (COLORS) => StyleSheet.create({
     borderWidth: 1, borderColor: `${COLORS.primary}33`,
     justifyContent: 'center', alignItems: 'center', marginBottom: SPACING.xs,
   },
+  connectBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.primary, paddingHorizontal: SPACING.lg, paddingVertical: 11, borderRadius: ROUNDED.full, marginTop: SPACING.md },
+  connectBtnText: { ...TYPOGRAPHY.labelMd, color: COLORS.onPrimary, fontWeight: '700' },
   emptyGreetingTitle: { ...TYPOGRAPHY.headlineMd, color: COLORS.onSurface, fontWeight: '800' },
   emptyGreetingSub: { ...TYPOGRAPHY.bodyMd, color: COLORS.onSurfaceVariant },
 

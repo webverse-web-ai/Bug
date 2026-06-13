@@ -145,6 +145,11 @@ export const TYPOGRAPHY = {
     fontSize: 14,
     lineHeight: 20,
   },
+  labelLg: {
+    fontFamily: 'SpaceGrotesk_600SemiBold',
+    fontSize: 15,
+    lineHeight: 20,
+  },
   labelMd: {
     fontFamily: 'JetBrainsMono_500Medium',
     fontSize: 13,

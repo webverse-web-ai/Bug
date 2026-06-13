@@ -1,0 +1,33 @@
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useTheme } from '@/contexts/ThemeContext';
+import { TYPOGRAPHY, SPACING } from '@/constants';
+import SectionShell from '@/components/layout/SectionShell';
+import { TALLY_AGENT, TALLY_NAV } from '@/components/tally/TallyKit';
+import { useVatData, VatAnalytics, VatFab } from '@/components/tally/VatKit';
+
+function Page() {
+  const { COLORS } = useTheme();
+  const { entries, summary, loading, reload } = useVatData();
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Text style={[styles.title, { color: COLORS.onSurface }]}>VAT Analytics</Text>
+        <Text style={[styles.sub, { color: COLORS.onSurfaceVariant }]}>Trace output vs input VAT, monthly liability and your top parties.</Text>
+        <VatAnalytics entries={entries} summary={summary} loading={loading} />
+        <View style={{ height: 110 }} />
+      </ScrollView>
+      <VatFab onSaved={reload} />
+    </View>
+  );
+}
+
+export default function VatAnalyticsScreen() {
+  return <SectionShell agent={TALLY_AGENT} navItems={TALLY_NAV} requirePermission="tally" title="Tally · VAT Analytics"><Page /></SectionShell>;
+}
+
+const styles = StyleSheet.create({
+  scroll: { padding: SPACING.lg, maxWidth: 920, width: '100%', alignSelf: 'center' },
+  title: { ...TYPOGRAPHY.headlineMd, fontSize: 20, fontWeight: '800' },
+  sub: { ...TYPOGRAPHY.bodySm, marginTop: 2, marginBottom: SPACING.md },
+});

@@ -1,5 +1,7 @@
 import connectToDatabase from '@/server/lib/db';
 import User from '@/server/models/User';
+import Team from '@/server/models/Team';
+import { serializeTeam } from '../team+api';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
@@ -24,6 +26,12 @@ export async function GET(request) {
         return Response.json({ error: 'User not found' }, { status: 404 });
       }
 
+      let team = null;
+      if (user.teamId) {
+        const t = await Team.findById(user.teamId);
+        if (t) team = serializeTeam(t, user._id);
+      }
+
       return Response.json({
         success: true,
         user: {
@@ -34,7 +42,10 @@ export async function GET(request) {
           username: user.username,
           path: user.path,
           hasGeminiToken: !!user.geminiToken,
-          hasOpenRouterKey: !!user.openRouterKey
+          hasOpenRouterKey: !!user.openRouterKey,
+          team,
+          teamStatus: user.teamStatus || (team ? team.myStatus : null),
+          role: user.role || (team ? team.myRole : null),
         }
       }, { status: 200 });
       

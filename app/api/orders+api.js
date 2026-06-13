@@ -1,5 +1,8 @@
 import connectToDatabase from '@/server/lib/db';
 import Order, { ORDER_STATUSES } from '@/server/models/Order';
+import Party from '@/server/models/Party';
+import { ensureCustomerParty, recordSale, bookIncome } from '@/server/lib/booking';
+import { getWorkspaceId, checkPermission } from '@/server/lib/workspace';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
@@ -15,15 +18,24 @@ function authenticate(request) {
 }
 
 function serialize(o) {
+  const dealAmount = Number(o.dealAmount) || Number(o.total) || 0;
+  const amountPaid = Math.max(0, Number(o.amountPaid) || 0);
+  const balanceDue = Math.max(0, dealAmount - amountPaid);
+  const paymentStatus = amountPaid <= 0 ? 'unpaid' : (balanceDue <= 0.001 ? 'paid' : 'partial');
   return {
     id: o._id.toString(),
     orderNumber: o.orderNumber,
     customer: o.customer || { name: '', email: '', phone: '' },
     items: o.items || [],
     total: o.total || 0,
+    dealAmount,
+    amountPaid,
+    balanceDue,
+    paymentStatus,
     status: o.status,
     priority: o.priority,
     channel: o.channel || 'Direct Web',
+    partyId: o.partyId || '',
     notes: o.notes || '',
     createdAt: o.createdAt,
     updatedAt: o.updatedAt,
@@ -44,11 +56,15 @@ function buildStats(orders) {
   const now = Date.now();
   const week = 7 * 24 * 3600 * 1000;
   let last7 = 0, prev7 = 0;
+  let collected = 0, outstanding = 0;
 
   for (const o of orders) {
     byStatus[o.status] = (byStatus[o.status] || 0) + 1;
     if (o.status === 'delivered') revenue += Number(o.total) || 0;
     if (o.status !== 'cancelled' && o.status !== 'delivered') openValue += Number(o.total) || 0;
+    const deal = Number(o.dealAmount) || Number(o.total) || 0;
+    const paid = Math.max(0, Number(o.amountPaid) || 0);
+    if (o.status !== 'cancelled') { collected += Math.min(paid, deal); outstanding += Math.max(0, deal - paid); }
     const created = asDate(o.createdAt);
     if (!Number.isNaN(created.getTime())) {
       if (created.toISOString().slice(0, 10) === today) todayCount += 1;
@@ -66,6 +82,8 @@ function buildStats(orders) {
     byStatus,
     revenue,            // realized revenue (delivered)
     openValue,          // value still in the pipeline
+    collected,          // cash actually received across orders
+    outstanding,        // balance still owed across orders
     todayCount,
     last7,
     trend,              // orders trend % (this week vs last)
@@ -79,7 +97,8 @@ export async function GET(request) {
     const decoded = authenticate(request);
     if (!decoded) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const all = await Order.find({ user: decoded.id });
+    const workspaceId = await getWorkspaceId(decoded);
+    const all = await Order.find({ user: workspaceId });
     const stats = buildStats(all);
 
     const url = new URL(request.url);
@@ -111,6 +130,8 @@ export async function POST(request) {
     await connectToDatabase();
     const decoded = authenticate(request);
     if (!decoded) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!(await checkPermission(decoded, 'pulse', 'create'))) return Response.json({ error: "You don't have permission to create orders" }, { status: 403 });
+    const workspaceId = await getWorkspaceId(decoded);
 
     const body = await request.json();
     const { customer, items, status, priority, channel, notes } = body;
@@ -129,23 +150,40 @@ export async function POST(request) {
 
     const derivedTotal = cleanItems.reduce((sum, it) => sum + it.qty * it.price, 0);
     const total = body.total !== undefined && body.total !== null ? Number(body.total) : derivedTotal;
+    const dealAmount = body.dealAmount !== undefined && body.dealAmount !== null && Number(body.dealAmount) > 0
+      ? Number(body.dealAmount) : total;
+    const advancePaid = Math.max(0, Math.min(Number(body.advancePaid) || 0, dealAmount));
 
-    const orderNumber = await Order.nextOrderNumber(decoded.id);
+    const cust = {
+      name: customer.name.trim(),
+      email: (customer.email || '').trim(),
+      phone: (customer.phone || '').trim(),
+    };
+
+    // Connect to Tally: use the explicitly-selected party when provided,
+    // otherwise link/create one by customer name. Then post the sale + advance.
+    let party = { id: '', name: cust.name };
+    try {
+      if (body.partyId) {
+        const existing = await Party.findOne({ _id: body.partyId, user: workspaceId });
+        party = existing ? { id: existing._id, name: existing.name } : await ensureCustomerParty(workspaceId, cust);
+      } else {
+        party = await ensureCustomerParty(workspaceId, cust);
+      }
+      await recordSale(workspaceId, party.id, dealAmount);
+    } catch (e) { console.error('Order→Tally party/sale link failed:', e); }
+
+    const orderNumber = await Order.nextOrderNumber(workspaceId);
     const order = await Order.create({
-      user: decoded.id,
-      orderNumber,
-      customer: {
-        name: customer.name.trim(),
-        email: (customer.email || '').trim(),
-        phone: (customer.phone || '').trim(),
-      },
-      items: cleanItems,
-      total,
-      status,
-      priority,
-      channel,
-      notes: (notes || '').trim(),
+      user: workspaceId, orderNumber, customer: cust,
+      items: cleanItems, total, dealAmount, amountPaid: advancePaid,
+      status, priority, channel, partyId: party.id, notes: (notes || '').trim(),
     });
+
+    if (advancePaid > 0) {
+      try { await bookIncome(workspaceId, { amount: advancePaid, partyId: party.id, partyName: party.name, description: `Advance · ${orderNumber}` }); }
+      catch (e) { console.error('Advance booking failed:', e); }
+    }
 
     return Response.json({ order: serialize(order) }, { status: 201 });
   } catch (error) {

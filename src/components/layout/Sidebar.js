@@ -18,6 +18,8 @@ import Animated, {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { canView } from '@/client/permissions';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 
 const AnimatedFlatList = Animated.FlatList;
@@ -121,6 +123,18 @@ function SessionRow({
   );
 }
 
+// A nav row with a coloured icon chip.
+function NavLink({ icon, label, color, styles, onPress, textColor }) {
+  return (
+    <TouchableOpacity style={styles.drawerLink} onPress={onPress} activeOpacity={0.7}>
+      <View style={[styles.linkIcon, { backgroundColor: `${color}22`, borderColor: `${color}55` }]}>
+        <MaterialCommunityIcons name={icon} size={17} color={color} />
+      </View>
+      <Text style={[styles.drawerLinkText, textColor && { color: textColor }]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 export default function Sidebar({
   isDesktop,
   toggleDrawer,
@@ -138,6 +152,7 @@ export default function Sidebar({
   handleLogout
 }) {
   const { COLORS } = useTheme();
+  const { user } = useAuth();
   const styles = getStyles(COLORS);
 
   return (
@@ -194,39 +209,19 @@ export default function Sidebar({
         )}
 
         <View style={styles.bottomLinksContainer}>
-          <TouchableOpacity
-            style={styles.drawerLink}
-            onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/knowledge'); }}
-          >
-            <MaterialCommunityIcons name="database" size={20} color={COLORS.onSurfaceVariant} />
-            <Text style={styles.drawerLinkText}>Knowledge Base</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.drawerLink}
-            onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/oms'); }}
-          >
-            <MaterialCommunityIcons name="pulse" size={20} color={COLORS.onSurfaceVariant} />
-            <Text style={styles.drawerLinkText}>Pulse · Orders</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.drawerLink}
-            onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/metrics'); }}
-          >
-            <MaterialCommunityIcons name="chart-line" size={20} color={COLORS.onSurfaceVariant} />
-            <Text style={styles.drawerLinkText}>System Metrics</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.drawerLink} onPress={handleGoToSetup}>
-            <MaterialCommunityIcons name="cog" size={20} color={COLORS.onSurfaceVariant} />
-            <Text style={styles.drawerLinkText}>Settings</Text>
-          </TouchableOpacity>
+          <NavLink icon="view-dashboard-outline" label="Dashboard" color="#89CEFF" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/dashboard'); }} />
+          <NavLink icon="database" label="Knowledge Base" color="#A78BFA" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/knowledge'); }} />
+          {canView(user, 'pulse') && <NavLink icon="pulse" label="Pulse · Orders" color="#34D399" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/pulse'); }} />}
+          {canView(user, 'tally') && <NavLink icon="calculator-variant" label="Tally · Accounts" color="#FFB86E" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/tally'); }} />}
+          <NavLink icon="chart-line" label="System Metrics" color="#38BDF8" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/metrics'); }} />
+          <NavLink icon="account-group-outline" label="Team" color="#EC4899" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/team'); }} />
+          <NavLink icon="account-circle-outline" label="My Profile" color="#FBBF24" styles={styles} onPress={() => { if (!isDesktop) toggleDrawer(); router.push('/bug/profile'); }} />
+          <NavLink icon="cog" label="Settings" color={COLORS.onSurfaceVariant} styles={styles} onPress={handleGoToSetup} />
         </View>
       </View>
 
       <View style={styles.drawerFooter}>
-        <TouchableOpacity style={styles.drawerLink} onPress={handleLogout}>
-          <MaterialCommunityIcons name="logout" size={20} color={COLORS.error} />
-          <Text style={[styles.drawerLinkText, { color: COLORS.error }]}>Log out</Text>
-        </TouchableOpacity>
+        <NavLink icon="logout" label="Log out" color={COLORS.error} styles={styles} textColor={COLORS.error} onPress={handleLogout} />
       </View>
     </>
   );
@@ -245,6 +240,7 @@ const getStyles = (COLORS) => StyleSheet.create({
   sectionHeader: { ...TYPOGRAPHY.labelSm, color: COLORS.onSurfaceVariant, marginBottom: SPACING.xs, marginLeft: SPACING.xs, textTransform: 'uppercase', fontWeight: 'bold' },
 
   drawerLink: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, padding: SPACING.md, borderRadius: ROUNDED.lg },
+  linkIcon: { width: 30, height: 30, borderRadius: 9, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
   drawerLinkActive: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, padding: SPACING.md, borderRadius: ROUNDED.lg, backgroundColor: COLORS.secondaryContainer },
   drawerLinkText: { ...TYPOGRAPHY.labelMd, color: COLORS.onSurfaceVariant, flex: 1 },
   drawerLinkTextActive: { ...TYPOGRAPHY.labelMd, color: COLORS.onSecondaryContainer, flex: 1, fontWeight: 'bold' },

@@ -49,9 +49,12 @@ const Order = {
       },
       items: Array.isArray(data.items) ? data.items : [],
       total: Number(data.total) || 0,
+      dealAmount: Number(data.dealAmount) || Number(data.total) || 0, // headline deal value
+      amountPaid: Math.max(0, Number(data.amountPaid) || 0),          // received so far (incl. advance)
       status: ORDER_STATUSES.includes(data.status) ? data.status : 'pending',
       priority: ORDER_PRIORITIES.includes(data.priority) ? data.priority : 'normal',
       channel: ORDER_CHANNELS.includes(data.channel) ? data.channel : 'Direct Web',
+      partyId: data.partyId || '',  // linked Tally customer
       notes: data.notes || '',
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -18,6 +18,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 import { getSessions, renameSession, deleteSession } from '@/client/api';
 import Sidebar from '@/components/layout/Sidebar';
+import BottomNav from '@/components/layout/BottomNav';
+import ThemeToggle from '@/components/layout/ThemeToggle';
+import AmbientBackground from '@/components/layout/AmbientBackground';
 
 // Lets page content (e.g. the chat) ask the shell to refresh the session list.
 const DashboardContext = createContext({ reloadSessions: () => {} });
@@ -49,6 +52,7 @@ export default function DashboardShell({ title, currentSessionId = null, childre
 
   const drawerAnim = useRef(new Animated.Value(-300)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
+  const railWidth = useRef(new Animated.Value(280)).current;
 
   const loadSessions = async () => {
     try {
@@ -80,8 +84,13 @@ export default function DashboardShell({ title, currentSessionId = null, childre
   };
 
   const toggleSidebar = () => {
-    if (isDesktop) setIsSidebarOpen(o => !o);
-    else toggleDrawer();
+    if (isDesktop) {
+      const open = !isSidebarOpen;
+      setIsSidebarOpen(open);
+      Animated.timing(railWidth, { toValue: open ? 280 : 0, duration: 240, useNativeDriver: false }).start();
+    } else {
+      toggleDrawer();
+    }
   };
 
   // Navigate to a chat route (replace when already on /bug to avoid history bloat).
@@ -154,39 +163,39 @@ export default function DashboardShell({ title, currentSessionId = null, childre
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <AmbientBackground COLORS={COLORS} />
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          {/* Desktop sidebar */}
-          {isDesktop && isSidebarOpen && (
-            <View style={styles.sidebarDesktop}>
-              <Sidebar {...sidebarProps} />
-            </View>
+          {/* Desktop sidebar — collapses smoothly via the hamburger */}
+          {isDesktop && (
+            <Animated.View style={[styles.railDesktop, { width: railWidth }]}>
+              <View style={styles.sidebarDesktop}>
+                <Sidebar {...sidebarProps} />
+              </View>
+            </Animated.View>
           )}
 
           {/* Main content */}
           <View style={{ flex: 1, flexDirection: 'column' }}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
-                <TouchableOpacity onPress={toggleSidebar} style={styles.iconButton}>
-                  <MaterialCommunityIcons name="menu" size={24} color={COLORS.primary} />
+                <TouchableOpacity onPress={toggleSidebar} style={styles.iconButton} hitSlop={6}>
+                  <MaterialCommunityIcons name={isDesktop && isSidebarOpen ? 'backburger' : 'menu'} size={24} color={COLORS.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
                   {headerTitle}
                 </Text>
               </View>
               <View style={styles.headerRight}>
-                <TouchableOpacity style={styles.iconButton} onPress={toggleTheme}>
-                  <MaterialCommunityIcons
-                    name={themeMode === 'dark' ? 'weather-sunny' : 'weather-night'}
-                    size={22}
-                    color={COLORS.onSurfaceVariant}
-                  />
-                </TouchableOpacity>
+                <ThemeToggle />
               </View>
             </View>
 
             <DashboardContext.Provider value={{ reloadSessions: loadSessions }}>
               <View style={{ flex: 1 }}>{children}</View>
             </DashboardContext.Provider>
+
+            {/* Mobile bottom nav — not on the chat page (it has its own input bar) */}
+            {!isDesktop && pathname !== '/bug' && <BottomNav />}
           </View>
         </View>
 
@@ -231,11 +240,15 @@ const getStyles = (COLORS) => StyleSheet.create({
     borderRightWidth: 1, borderRightColor: COLORS.outlineVariant,
     zIndex: 50, paddingVertical: SPACING.lg,
   },
-  sidebarDesktop: {
-    width: 280,
+  railDesktop: {
+    overflow: 'hidden',
     backgroundColor: COLORS.surfaceContainerLow,
     borderRightWidth: 1,
     borderRightColor: COLORS.outlineVariant,
+  },
+  sidebarDesktop: {
+    width: 280,
+    flex: 1,
     paddingVertical: SPACING.lg,
   },
 });

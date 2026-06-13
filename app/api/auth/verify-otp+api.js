@@ -2,6 +2,7 @@ import connectToDatabase from '@/server/lib/db';
 import User from '@/server/models/User';
 import OTP from '@/server/models/OTP';
 import jwt from 'jsonwebtoken';
+import { signToken } from '@/server/lib/token';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
@@ -37,7 +38,7 @@ export async function POST(request) {
     await OTP.deleteMany({ email });
 
     // Generate JWT
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = signToken(user._id, user.teamId);
 
     return Response.json({ 
       success: true, 

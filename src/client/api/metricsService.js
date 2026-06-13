@@ -13,6 +13,14 @@ export const getFreeModels = async () => {
   return data.models;
 };
 
+// Google Gemini chat models (empty unless the user has Gemini connected).
+export const getGeminiModels = async () => {
+  const response = await fetch('/api/gemini-models', { headers: await authHeaders(), cache: 'no-store' });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Failed to fetch Gemini models');
+  return data; // { connected, models }
+};
+
 // The user's selected chat models.
 export const getSelectedModels = async () => {
   const response = await fetch('/api/user/models', { headers: await authHeaders(), cache: 'no-store' });

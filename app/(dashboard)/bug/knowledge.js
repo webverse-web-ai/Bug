@@ -12,6 +12,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeOutLeft, LinearTransition, FadeIn } from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
+import { SkeletonCard } from '@/components/ui/Skeleton';
 import { TYPOGRAPHY, SPACING, ROUNDED } from '@/constants';
 import DashboardShell from '@/components/layout/DashboardShell';
 import { getKnowledge, createKnowledge, updateKnowledge, deleteKnowledge } from '@/client/api';
@@ -210,9 +211,7 @@ function KnowledgeBody() {
 
       {/* List */}
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+        <><SkeletonCard rows={2} /><SkeletonCard rows={3} /><SkeletonCard rows={2} /></>
       ) : entries.length === 0 ? (
         <View style={styles.empty}>
           <MaterialCommunityIcons name="brain" size={40} color={COLORS.onSurfaceVariant} />

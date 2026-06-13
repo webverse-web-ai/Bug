@@ -1,5 +1,7 @@
 import connectToDatabase from '@/server/lib/db';
 import Order, { ORDER_STATUSES, ORDER_PRIORITIES, ORDER_CHANNELS } from '@/server/models/Order';
+import { bookIncome } from '@/server/lib/booking';
+import { getWorkspaceId, checkPermission } from '@/server/lib/workspace';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
@@ -15,15 +17,21 @@ function authenticate(request) {
 }
 
 function serialize(o) {
+  const dealAmount = Number(o.dealAmount) || Number(o.total) || 0;
+  const amountPaid = Math.max(0, Number(o.amountPaid) || 0);
+  const balanceDue = Math.max(0, dealAmount - amountPaid);
   return {
     id: o._id.toString(),
     orderNumber: o.orderNumber,
     customer: o.customer || { name: '', email: '', phone: '' },
     items: o.items || [],
     total: o.total || 0,
+    dealAmount, amountPaid, balanceDue,
+    paymentStatus: amountPaid <= 0 ? 'unpaid' : (balanceDue <= 0.001 ? 'paid' : 'partial'),
     status: o.status,
     priority: o.priority,
     channel: o.channel || 'Direct Web',
+    partyId: o.partyId || '',
     notes: o.notes || '',
     createdAt: o.createdAt,
     updatedAt: o.updatedAt,
@@ -36,8 +44,10 @@ export async function PUT(request, { id }) {
     await connectToDatabase();
     const decoded = authenticate(request);
     if (!decoded) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!(await checkPermission(decoded, 'pulse', 'edit'))) return Response.json({ error: "You don't have permission to edit orders" }, { status: 403 });
+    const workspaceId = await getWorkspaceId(decoded);
 
-    const order = await Order.findOne({ _id: id, user: decoded.id });
+    const order = await Order.findOne({ _id: id, user: workspaceId });
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
     const body = await request.json();
@@ -83,7 +93,21 @@ export async function PUT(request, { id }) {
       }
     }
     if (body.total !== undefined) updates.total = Number(body.total) || 0;
+    if (body.dealAmount !== undefined) updates.dealAmount = Math.max(0, Number(body.dealAmount) || 0);
     if (body.notes !== undefined) updates.notes = String(body.notes || '').trim();
+
+    // Record a payment: increase amountPaid and post the cash to Tally as income.
+    const payment = Number(body.recordPayment) || 0;
+    if (payment > 0) {
+      const deal = updates.dealAmount ?? (Number(order.dealAmount) || Number(order.total) || 0);
+      const newPaid = Math.min((Number(order.amountPaid) || 0) + payment, deal);
+      updates.amountPaid = newPaid;
+      try {
+        await bookIncome(workspaceId, { amount: payment, partyId: order.partyId, partyName: order.customer?.name, description: `Payment · ${order.orderNumber}` });
+      } catch (e) { console.error('Payment booking failed:', e); }
+    } else if (body.amountPaid !== undefined) {
+      updates.amountPaid = Math.max(0, Number(body.amountPaid) || 0);
+    }
 
     if (Object.keys(updates).length === 0) {
       return Response.json({ error: 'No valid fields to update' }, { status: 400 });
@@ -103,8 +127,10 @@ export async function DELETE(request, { id }) {
     await connectToDatabase();
     const decoded = authenticate(request);
     if (!decoded) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!(await checkPermission(decoded, 'pulse', 'delete'))) return Response.json({ error: "You don't have permission to delete orders" }, { status: 403 });
+    const workspaceId = await getWorkspaceId(decoded);
 
-    const order = await Order.findOne({ _id: id, user: decoded.id });
+    const order = await Order.findOne({ _id: id, user: workspaceId });
     if (!order) return Response.json({ error: 'Order not found' }, { status: 404 });
 
     await Order.findByIdAndDelete(id);

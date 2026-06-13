@@ -3,6 +3,7 @@ import User from '@/server/models/User';
 import Chat from '@/server/models/Chat';
 import Knowledge from '@/server/models/Knowledge';
 import { BUG_MODEL_ID, isBugId } from '@/server/lib/bugModel';
+import { isGeminiId, geminiApiModel } from '@/server/lib/geminiModels';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
@@ -446,8 +447,10 @@ export async function POST(request) {
       return { sessionId: chat._id.toString(), title: chat.title };
     };
 
-    // 4. Route to OpenRouter (Bug meta-model or resilient single model) or Gemini
-    if (user.openRouterKey && modelId !== 'google/gemini-fallback') {
+    // 4. Route to OpenRouter (Bug meta-model or resilient single model) or Gemini.
+    // A `gemini/*` pick is explicit Gemini — skip OpenRouter entirely so the
+    // user's chosen Gemini model actually answers.
+    if (user.openRouterKey && !isGeminiId(modelId) && modelId !== 'google/gemini-fallback') {
       const openRouterMessages = [
         { role: 'system', content: systemPrompt },
         ...fullHistory.map(m => ({
@@ -469,7 +472,7 @@ export async function POST(request) {
       let outcome;
       if (isBug) {
         // Bug draws on the user's curated working models (minus Bug itself).
-        const pool = (user.selectedModels || []).map(m => m.id).filter(id => id && !isBugId(id));
+        const pool = (user.selectedModels || []).map(m => m.id).filter(id => id && !isBugId(id) && !isGeminiId(id));
         outcome = await runBugModel({
           key: user.openRouterKey, messages: openRouterMessages, webSearch,
           mode, pool, question: latestUserMessageText,
@@ -528,7 +531,9 @@ export async function POST(request) {
       parts: [{ text: 'Understood. I am Bug, CEO of Bug AI.' }]
     });
 
-    const geminiModel = 'gemini-1.5-flash';
+    // Honour an explicitly-selected Gemini model; otherwise use a fast default.
+    const geminiModel = isGeminiId(modelId) ? geminiApiModel(modelId) : 'gemini-1.5-flash';
+    const geminiUsageId = isGeminiId(modelId) ? modelId : `google/${geminiModel}`;
 
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`,
@@ -559,15 +564,26 @@ export async function POST(request) {
         await Chat.update(chat._id, { messages: chat.messages });
       }
 
-      incrementUsage(user._id, `google/${geminiModel}`).catch(err => console.error('Usage increment failed:', err));
+      incrementUsage(user._id, geminiUsageId).catch(err => console.error('Usage increment failed:', err));
       data.sessionId = chat._id.toString();
       data.title = chat.title;
       return Response.json(data);
     } else {
       const errorData = await geminiResponse.json().catch(() => ({}));
-      console.error('Gemini API failed:', errorData.error?.message);
-      
-      const fallbackText = "⚠️ I'm having trouble connecting to my AI brain right now, but your message was saved!";
+      const reason = errorData.error?.message || `Gemini responded ${geminiResponse.status}`;
+      console.error('Gemini API failed:', reason);
+
+      // Surface the actual cause so the user can act on it (bad/leaked key,
+      // model not available, quota, etc.) instead of a vague "brain" message.
+      const low = reason.toLowerCase();
+      let fallbackText;
+      if (low.includes('leaked') || low.includes('api key not valid') || low.includes('api_key_invalid') || geminiResponse.status === 403 || geminiResponse.status === 400) {
+        fallbackText = `⚠️ Gemini rejected the request: ${reason}\n\nThe server's Google Gemini API key looks invalid or disabled. Set a fresh \`GEMINI_API_KEY\` (from Google AI Studio) and restart the server, or use an OpenRouter model in the meantime.`;
+      } else if (geminiResponse.status === 404) {
+        fallbackText = `⚠️ Gemini couldn't find the model \`${geminiModel}\`. Pick a different Gemini model — this one isn't available to your key.`;
+      } else {
+        fallbackText = `⚠️ Gemini couldn't respond right now: ${reason}\n\nYour message was saved — please try again or switch models.`;
+      }
       chat.messages.push({ role: 'model', text: fallbackText });
       
       if (isNewChat) {

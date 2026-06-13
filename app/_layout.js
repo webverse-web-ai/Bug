@@ -27,19 +27,22 @@ function RootLayoutNav({ appReady, setAppReady }) {
     // Wait until both the splash animation finishes and auth is done loading
     if (loading || !appReady) return;
 
-    const inAuthGroup = segments[0] === 'auth';
+    const inAuth = segments[0] === 'auth';
+    const inSetup = segments[0] === 'setup';
+    // Fully onboarded = personal username AND an approved team membership. This
+    // must match (dashboard)/_layout exactly, or the two gates ping-pong forever.
+    const onboarded = !!user?.username && !!user?.team && user.team.myStatus === 'approved';
 
-    if (!user && !inAuthGroup) {
-      // Redirect to the login page
-      router.replace('/auth/login');
-    } else if (user) {
-      const hasCompletedSetup = !!user.username;
-      
-      if (!hasCompletedSetup && segments[0] !== 'setup') {
-        router.replace('/setup');
-      } else if (hasCompletedSetup && (inAuthGroup || segments[0] === 'setup')) {
-        router.replace('/(dashboard)');
-      }
+    if (!user) {
+      if (!inAuth) router.replace('/auth/login');
+    } else if (!onboarded) {
+      // Incomplete users belong on /setup — but never redirect while already
+      // there (that would loop as they complete each step).
+      if (!inSetup) router.replace('/setup');
+    } else {
+      // Onboarded: bounce off auth pages, but DON'T force-leave /setup so the
+      // optional AI step (shown after the team is created) stays reachable.
+      if (inAuth) router.replace('/(dashboard)');
     }
   }, [user, loading, segments, appReady]);
 
